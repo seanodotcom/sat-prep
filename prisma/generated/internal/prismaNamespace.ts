@@ -394,7 +394,9 @@ export const ModelName = {
   StudyProgress: 'StudyProgress',
   MissionProgress: 'MissionProgress',
   ReviewItem: 'ReviewItem',
-  MissionAttempt: 'MissionAttempt'
+  MissionAttempt: 'MissionAttempt',
+  QuestionContent: 'QuestionContent',
+  PlanDayContent: 'PlanDayContent'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -410,7 +412,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "userProfile" | "studyProgress" | "missionProgress" | "reviewItem" | "missionAttempt"
+    modelProps: "userProfile" | "studyProgress" | "missionProgress" | "reviewItem" | "missionAttempt" | "questionContent" | "planDayContent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -784,6 +786,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    QuestionContent: {
+      payload: Prisma.$QuestionContentPayload<ExtArgs>
+      fields: Prisma.QuestionContentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.QuestionContentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionContentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.QuestionContentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionContentPayload>
+        }
+        findFirst: {
+          args: Prisma.QuestionContentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionContentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.QuestionContentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionContentPayload>
+        }
+        findMany: {
+          args: Prisma.QuestionContentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionContentPayload>[]
+        }
+        create: {
+          args: Prisma.QuestionContentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionContentPayload>
+        }
+        createMany: {
+          args: Prisma.QuestionContentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.QuestionContentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionContentPayload>[]
+        }
+        delete: {
+          args: Prisma.QuestionContentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionContentPayload>
+        }
+        update: {
+          args: Prisma.QuestionContentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionContentPayload>
+        }
+        deleteMany: {
+          args: Prisma.QuestionContentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.QuestionContentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.QuestionContentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionContentPayload>[]
+        }
+        upsert: {
+          args: Prisma.QuestionContentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionContentPayload>
+        }
+        aggregate: {
+          args: Prisma.QuestionContentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateQuestionContent>
+        }
+        groupBy: {
+          args: Prisma.QuestionContentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.QuestionContentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.QuestionContentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.QuestionContentCountAggregateOutputType> | number
+        }
+      }
+    }
+    PlanDayContent: {
+      payload: Prisma.$PlanDayContentPayload<ExtArgs>
+      fields: Prisma.PlanDayContentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PlanDayContentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanDayContentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PlanDayContentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanDayContentPayload>
+        }
+        findFirst: {
+          args: Prisma.PlanDayContentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanDayContentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PlanDayContentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanDayContentPayload>
+        }
+        findMany: {
+          args: Prisma.PlanDayContentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanDayContentPayload>[]
+        }
+        create: {
+          args: Prisma.PlanDayContentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanDayContentPayload>
+        }
+        createMany: {
+          args: Prisma.PlanDayContentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PlanDayContentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanDayContentPayload>[]
+        }
+        delete: {
+          args: Prisma.PlanDayContentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanDayContentPayload>
+        }
+        update: {
+          args: Prisma.PlanDayContentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanDayContentPayload>
+        }
+        deleteMany: {
+          args: Prisma.PlanDayContentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PlanDayContentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PlanDayContentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanDayContentPayload>[]
+        }
+        upsert: {
+          args: Prisma.PlanDayContentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlanDayContentPayload>
+        }
+        aggregate: {
+          args: Prisma.PlanDayContentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePlanDayContent>
+        }
+        groupBy: {
+          args: Prisma.PlanDayContentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlanDayContentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PlanDayContentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlanDayContentCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -900,6 +1050,42 @@ export const MissionAttemptScalarFieldEnum = {
 } as const
 
 export type MissionAttemptScalarFieldEnum = (typeof MissionAttemptScalarFieldEnum)[keyof typeof MissionAttemptScalarFieldEnum]
+
+
+export const QuestionContentScalarFieldEnum = {
+  id: 'id',
+  section: 'section',
+  domain: 'domain',
+  skill: 'skill',
+  difficulty: 'difficulty',
+  prompt: 'prompt',
+  choices: 'choices',
+  answer: 'answer',
+  explanation: 'explanation',
+  estimatedTimeSec: 'estimatedTimeSec',
+  errorTags: 'errorTags',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userProfileId: 'userProfileId'
+} as const
+
+export type QuestionContentScalarFieldEnum = (typeof QuestionContentScalarFieldEnum)[keyof typeof QuestionContentScalarFieldEnum]
+
+
+export const PlanDayContentScalarFieldEnum = {
+  day: 'day',
+  title: 'title',
+  focus: 'focus',
+  missionType: 'missionType',
+  duration: 'duration',
+  rationale: 'rationale',
+  missionConfig: 'missionConfig',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userProfileId: 'userProfileId'
+} as const
+
+export type PlanDayContentScalarFieldEnum = (typeof PlanDayContentScalarFieldEnum)[keyof typeof PlanDayContentScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1130,6 +1316,8 @@ export type GlobalOmitConfig = {
   missionProgress?: Prisma.MissionProgressOmit
   reviewItem?: Prisma.ReviewItemOmit
   missionAttempt?: Prisma.MissionAttemptOmit
+  questionContent?: Prisma.QuestionContentOmit
+  planDayContent?: Prisma.PlanDayContentOmit
 }
 
 /* Types for Logging */

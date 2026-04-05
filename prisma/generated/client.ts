@@ -69,3 +69,13 @@ export type ReviewItem = Prisma.ReviewItemModel
  * 
  */
 export type MissionAttempt = Prisma.MissionAttemptModel
+/**
+ * Model QuestionContent
+ * 
+ */
+export type QuestionContent = Prisma.QuestionContentModel
+/**
+ * Model PlanDayContent
+ * 
+ */
+export type PlanDayContent = Prisma.PlanDayContentModel

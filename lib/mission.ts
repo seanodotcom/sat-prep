@@ -1,15 +1,16 @@
-import { dayPlan, dayRationales, missionSteps } from "@/data/mock-data";
+import { seedPlanDays } from "@/lib/content-seeds";
 import {
   defaultMissionProgress,
   defaultStudyProgress,
   type StoredMissionProgress,
   type StudyProgress
 } from "@/lib/storage";
+import type { PlanDayContent } from "@/lib/types";
 
 export function getMissionSnapshot(progress: StoredMissionProgress = defaultMissionProgress) {
-  const totalSteps = missionSteps.length;
+  const totalSteps = seedPlanDays[0]?.missionConfig.steps.length ?? 4;
   const currentStepIndex = Math.min(progress.currentStepIndex, totalSteps);
-  const activeStep = missionSteps[Math.min(currentStepIndex, totalSteps - 1)];
+  const activeStep = seedPlanDays[0]?.missionConfig.steps[Math.min(currentStepIndex, totalSteps - 1)];
   const completedSteps = Math.min(currentStepIndex, totalSteps);
   const flowPercent = Math.round((completedSteps / totalSteps) * 100);
 
@@ -36,9 +37,17 @@ export function getMissionSnapshot(progress: StoredMissionProgress = defaultMiss
 }
 
 export function getCurrentDayProgress(progress: StudyProgress = defaultStudyProgress) {
-  const currentDay = Math.min(progress.currentDay, dayPlan.length);
-  const totalDays = dayPlan.length;
-  const currentPlan = dayPlan[currentDay - 1] ?? dayPlan[0];
+  return getCurrentDayProgressFromPlan(progress);
+}
+
+export function getCurrentDayProgressFromPlan(
+  progress: StudyProgress = defaultStudyProgress,
+  planDays: PlanDayContent[] = seedPlanDays
+) {
+  const normalizedPlanDays = planDays.length ? planDays : seedPlanDays;
+  const currentDay = Math.min(progress.currentDay, normalizedPlanDays.length);
+  const totalDays = normalizedPlanDays.length;
+  const currentPlan = normalizedPlanDays[currentDay - 1] ?? normalizedPlanDays[0];
 
   return {
     currentDay,
@@ -49,9 +58,17 @@ export function getCurrentDayProgress(progress: StudyProgress = defaultStudyProg
 }
 
 export function getUpcomingDayPreview(progress: StudyProgress = defaultStudyProgress) {
-  const { currentDay, totalDays, currentPlan } = getCurrentDayProgress(progress);
+  return getUpcomingDayPreviewFromPlan(progress);
+}
+
+export function getUpcomingDayPreviewFromPlan(
+  progress: StudyProgress = defaultStudyProgress,
+  planDays: PlanDayContent[] = seedPlanDays
+) {
+  const normalizedPlanDays = planDays.length ? planDays : seedPlanDays;
+  const { currentDay, totalDays, currentPlan } = getCurrentDayProgressFromPlan(progress, normalizedPlanDays);
   const nextDay = Math.min(currentDay + 1, totalDays);
-  const nextPlan = dayPlan[nextDay - 1] ?? currentPlan;
+  const nextPlan = normalizedPlanDays[nextDay - 1] ?? currentPlan;
   const hasUpcomingDay = currentDay < totalDays;
 
   return {
@@ -62,8 +79,13 @@ export function getUpcomingDayPreview(progress: StudyProgress = defaultStudyProg
 }
 
 export function getDayRationale(day: number) {
+  return getDayRationaleFromPlan(day);
+}
+
+export function getDayRationaleFromPlan(day: number, planDays: PlanDayContent[] = seedPlanDays) {
+  const normalizedPlanDays = planDays.length ? planDays : seedPlanDays;
   return (
-    dayRationales[day] ??
+    normalizedPlanDays.find((item) => item.day === day)?.rationale ??
     "This day continues the 30-day sequence with one clear focus so the routine stays understandable and repeatable."
   );
 }

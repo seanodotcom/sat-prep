@@ -2,9 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { readClientAppState, subscribeToAppStateSync, syncAppStateFromServer } from "@/lib/app-state-client";
-import { getMissionDayConfig } from "@/data/mock-data";
 import { Chip } from "@/components/ui/chip";
-import { getCurrentDayProgress, getDayRationale, getMissionSnapshot } from "@/lib/mission";
+import { hydrateMissionConfig } from "@/lib/content";
+import { getCurrentDayProgressFromPlan, getDayRationaleFromPlan, getMissionSnapshot } from "@/lib/mission";
 import {
   defaultMissionProgress,
   defaultStudyProgress,
@@ -12,10 +12,12 @@ import {
   type StudyProgress
 } from "@/lib/storage";
 import { cn } from "@/lib/utils";
+import { useStudyContent } from "@/lib/use-study-content";
 
 export function MissionOverview() {
   const [progress, setProgress] = useState<StoredMissionProgress>(defaultMissionProgress);
   const [studyProgress, setStudyProgress] = useState<StudyProgress>(defaultStudyProgress);
+  const { questions, planDays } = useStudyContent();
 
   useEffect(() => {
     function syncFromClientState() {
@@ -39,12 +41,18 @@ export function MissionOverview() {
   }, []);
 
   const snapshot = useMemo(() => getMissionSnapshot(progress), [progress]);
-  const dayProgress = useMemo(() => getCurrentDayProgress(studyProgress), [studyProgress]);
-  const missionConfig = useMemo(
-    () => getMissionDayConfig(dayProgress.currentDay, dayProgress.currentPlan),
-    [dayProgress]
+  const dayProgress = useMemo(
+    () => getCurrentDayProgressFromPlan(studyProgress, planDays),
+    [planDays, studyProgress]
   );
-  const dayRationale = useMemo(() => getDayRationale(dayProgress.currentDay), [dayProgress.currentDay]);
+  const missionConfig = useMemo(
+    () => hydrateMissionConfig(dayProgress.currentPlan, questions),
+    [dayProgress.currentPlan, questions]
+  );
+  const dayRationale = useMemo(
+    () => getDayRationaleFromPlan(dayProgress.currentDay, planDays),
+    [dayProgress.currentDay, planDays]
+  );
   const missionComplete = snapshot.completedSteps >= snapshot.totalSteps;
   const steps = missionConfig.steps.map((step, index) => ({
     ...step,

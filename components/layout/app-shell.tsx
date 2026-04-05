@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { Route } from "next";
-import { appNav } from "@/data/mock-data";
+import { appNav } from "@/lib/navigation";
 import {
   readClientAppState,
   subscribeToAppStateSync,
@@ -12,14 +12,17 @@ import {
 } from "@/lib/app-state-client";
 import {
   loadMissionAttempts,
+  clearMissionAttempts,
   subscribeToMissionAttemptsSync,
   syncMissionAttemptsFromServer
 } from "@/lib/mission-attempts-client";
+import { clearAllReviewItems } from "@/lib/review-items-client";
 import { Button } from "@/components/ui/button";
 import { Chip } from "@/components/ui/chip";
 import { cn } from "@/lib/utils";
 import { getCurrentStreak, getQuestionsSolved } from "@/lib/dashboard-insights";
-import { getCurrentDayProgress, getMissionSnapshot } from "@/lib/mission";
+import { getCurrentDayProgressFromPlan, getMissionSnapshot } from "@/lib/mission";
+import { useStudyContent } from "@/lib/use-study-content";
 import {
   defaultOnboardingPreferences,
   defaultStudyProgress,
@@ -50,24 +53,49 @@ export function AppShell({
   const [menuOpen, setMenuOpen] = useState(false);
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const { planDays } = useStudyContent();
 
   useEffect(() => {
+    function setProgressIfChanged(nextValue: StoredMissionProgress) {
+      setProgress((current) =>
+        JSON.stringify(current) === JSON.stringify(nextValue) ? current : nextValue
+      );
+    }
+
+    function setPreferencesIfChanged(nextValue: OnboardingPreferences) {
+      setPreferences((current) =>
+        JSON.stringify(current) === JSON.stringify(nextValue) ? current : nextValue
+      );
+    }
+
+    function setStudyProgressIfChanged(nextValue: StudyProgress) {
+      setStudyProgress((current) =>
+        JSON.stringify(current) === JSON.stringify(nextValue) ? current : nextValue
+      );
+    }
+
+    function setAttemptsIfChanged(nextValue: MissionAttemptRecord[]) {
+      setAttempts((current) =>
+        JSON.stringify(current) === JSON.stringify(nextValue) ? current : nextValue
+      );
+    }
+
     function syncFromClientState() {
       const state = readClientAppState();
-      setProgress(state.missionProgress);
-      setPreferences(state.onboardingPreferences);
-      setStudyProgress(state.studyProgress);
-      setAttempts(loadMissionAttempts());
+      setProgressIfChanged(state.missionProgress);
+      setPreferencesIfChanged(state.onboardingPreferences);
+      setStudyProgressIfChanged(state.studyProgress);
+      setAttemptsIfChanged(loadMissionAttempts());
     }
 
     try {
       syncFromClientState();
       void syncAppStateFromServer().then((state) => {
-        setProgress(state.missionProgress);
-        setPreferences(state.onboardingPreferences);
-        setStudyProgress(state.studyProgress);
+        setProgressIfChanged(state.missionProgress);
+        setPreferencesIfChanged(state.onboardingPreferences);
+        setStudyProgressIfChanged(state.studyProgress);
       });
-      void syncMissionAttemptsFromServer().then(setAttempts);
+      void syncMissionAttemptsFromServer().then(setAttemptsIfChanged);
     } catch {
       setProgress(defaultMissionProgress);
       setPreferences(defaultOnboardingPreferences);
@@ -78,7 +106,7 @@ export function AppShell({
 
     const unsubscribeAppState = subscribeToAppStateSync(syncFromClientState);
     const unsubscribeAttempts = subscribeToMissionAttemptsSync(() => {
-      setAttempts(loadMissionAttempts());
+      setAttemptsIfChanged(loadMissionAttempts());
     });
 
     return () => {
@@ -93,16 +121,31 @@ export function AppShell({
   }, [hydrated, preferences, router]);
 
   const snapshot = useMemo(() => getMissionSnapshot(progress), [progress]);
-  const dayProgress = useMemo(() => getCurrentDayProgress(studyProgress), [studyProgress]);
+  const dayProgress = useMemo(
+    () => getCurrentDayProgressFromPlan(studyProgress, planDays),
+    [planDays, studyProgress]
+  );
   const streakDays = useMemo(() => getCurrentStreak(studyProgress), [studyProgress]);
   const questionsSolved = useMemo(() => getQuestionsSolved(attempts), [attempts]);
   const onboardingComplete = hasCompletedOnboarding(preferences);
 
-  function confirmFullReset() {
+  async function confirmFullReset() {
     clearAppStorage();
+
+    try {
+      await Promise.all([
+        fetch("/api/app-state", { method: "DELETE" }),
+        clearMissionAttempts(),
+        clearAllReviewItems()
+      ]);
+    } catch (error) {
+      console.error("Unable to fully reset saved data", error);
+    }
+
     setProgress(defaultMissionProgress);
     setPreferences(defaultOnboardingPreferences);
     setStudyProgress(defaultStudyProgress);
+    setAttempts([]);
     setResetConfirmOpen(false);
     setMenuOpen(false);
     router.push("/");

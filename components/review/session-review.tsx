@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { allMissionQuestions } from "@/data/mock-data";
 import {
   clearSessionReviewItems,
   deleteReviewItem,
@@ -24,6 +23,7 @@ import {
 } from "@/lib/storage";
 import { getMissionSnapshot } from "@/lib/mission";
 import type { PersistedReviewItem, SessionReviewItem } from "@/lib/types";
+import { useStudyContent } from "@/lib/use-study-content";
 
 export function SessionReview() {
   const [progress, setProgress] = useState<StoredMissionProgress>(defaultMissionProgress);
@@ -33,6 +33,7 @@ export function SessionReview() {
   const [retryChoice, setRetryChoice] = useState<string | null>(null);
   const [retrySubmitted, setRetrySubmitted] = useState(false);
   const retryPanelRef = useRef<HTMLDivElement | null>(null);
+  const { questions } = useStudyContent();
 
   useEffect(() => {
     function syncFromClientState() {
@@ -97,7 +98,7 @@ export function SessionReview() {
       ? "You’re already in the review step of the mission flow. Use the mission screen if you want the in-flow version of this handoff."
       : `Your live mission state says the next active step is ${snapshot.activeStep.title}. Jump back in without losing your saved progress.`;
   const activeRetryQuestion = activeRetryId
-    ? allMissionQuestions.find((question) => question.id === activeRetryId) ?? null
+    ? questions.find((question) => question.id === activeRetryId) ?? null
     : null;
   const activeReviewItem = activeRetryId
     ? reviewItems.find((item) => item.questionId === activeRetryId && item.status !== "resolved") ?? null
@@ -231,9 +232,9 @@ export function SessionReview() {
       </div>
 
       <div className="panel rounded-[28px] p-6">
-        <p className="text-sm font-semibold text-slate-100">Seed review bank</p>
+        <p className="text-sm font-semibold text-slate-100">Extra review bank</p>
         <p className="mt-2 text-sm text-slate-400">
-          These seeded items now live in the database too, so the review screen stays useful even before a fresh mission creates new misses.
+          These saved review items keep the screen useful even before a new mission creates fresh misses.
         </p>
         <div className="mt-5 grid gap-4">
           {seedItems.map((item) => (

@@ -1,4 +1,4 @@
-import { marketingNav } from "@/data/mock-data";
+import { marketingNav } from "@/lib/navigation";
 import { Button } from "@/components/ui/button";
 
 export function MarketingHeader() {

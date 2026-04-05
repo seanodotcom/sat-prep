@@ -32,6 +32,12 @@ export type MissionQuestionSet = {
   questions: Question[];
 };
 
+export type MissionQuestionSetDefinition = {
+  stepId: string;
+  introLabel: string;
+  questionIds: string[];
+};
+
 export type MissionBriefCard = {
   title: string;
   detail: string;
@@ -52,6 +58,10 @@ export type MissionDayConfig = {
   questionSets: MissionQuestionSet[];
 };
 
+export type MissionDayContent = Omit<MissionDayConfig, "questionSets"> & {
+  questionSets: MissionQuestionSetDefinition[];
+};
+
 export type DayPlan = {
   day: number;
   title: string;
@@ -59,6 +69,11 @@ export type DayPlan = {
   missionType: string;
   duration: string;
   status?: "complete" | "current" | "upcoming";
+};
+
+export type PlanDayContent = DayPlan & {
+  rationale: string;
+  missionConfig: MissionDayContent;
 };
 
 export type RewardBadge = {

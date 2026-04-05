@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Summit SAT",
-  description: "Builder-ready SAT prep starter UI for a 30-day score sprint.",
+  description: "A focused SAT prep app for daily missions, review, and measurable progress.",
   icons: {
     icon: "/icon.svg"
   }

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import {
+  clearAllReviewItemsInDb,
   clearActiveReviewItemsInDb,
   deleteReviewItemFromDb,
   readReviewItemsFromDb,
@@ -23,6 +24,11 @@ export async function DELETE(request: Request) {
   const { searchParams } = new URL(request.url);
   const scope = searchParams.get("scope");
   const id = searchParams.get("id");
+
+  if (scope === "all") {
+    await clearAllReviewItemsInDb();
+    return NextResponse.json({ ok: true });
+  }
 
   if (scope === "session") {
     await clearActiveReviewItemsInDb();

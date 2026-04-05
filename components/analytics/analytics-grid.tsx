@@ -10,11 +10,13 @@ import {
 import { loadReviewItems, subscribeToReviewItemsSync, syncReviewItemsFromServer } from "@/lib/review-items-client";
 import { getAveragePace, getSectionAccuracy } from "@/lib/attempt-insights";
 import { getReviewResolutionStats, getSkillMetricsFromReviewItems } from "@/lib/review-insights";
+import { useStudyContent } from "@/lib/use-study-content";
 import type { MissionAttemptRecord, PersistedReviewItem } from "@/lib/types";
 
 export function AnalyticsGrid() {
   const [reviewItems, setReviewItems] = useState<PersistedReviewItem[]>([]);
   const [attempts, setAttempts] = useState<MissionAttemptRecord[]>([]);
+  const { questions } = useStudyContent();
 
   useEffect(() => {
     function syncLocal() {
@@ -34,8 +36,8 @@ export function AnalyticsGrid() {
   }, []);
 
   const metrics = useMemo(
-    () => getSkillMetricsFromReviewItems(reviewItems, attempts),
-    [reviewItems, attempts]
+    () => getSkillMetricsFromReviewItems(reviewItems, attempts, questions),
+    [reviewItems, attempts, questions]
   );
   const reviewStats = useMemo(() => getReviewResolutionStats(reviewItems), [reviewItems]);
   const mathStats = useMemo(() => getSectionAccuracy(attempts, "Math"), [attempts]);
@@ -52,12 +54,14 @@ export function AnalyticsGrid() {
             value={`${mathStats.accuracy}%`}
             subtext={`${mathStats.total} math attempts logged`}
             progress={mathStats.accuracy}
+            tone="accent"
           />
           <MetricCard
             title="Reading & Writing"
             value={`${readingStats.accuracy}%`}
             subtext={`${readingStats.total} verbal attempts logged`}
             progress={readingStats.accuracy}
+            tone="success"
           />
           <MetricCard
             title="Average pace"
@@ -68,12 +72,14 @@ export function AnalyticsGrid() {
                 : "Complete a timed mini-test to populate pace."
             }
             progress={paceStats.timedCount ? Math.max(0, Math.min(100, 100 - paceStats.avgPaceSec)) : 0}
+            tone="warning"
           />
           <MetricCard
             title="Review resolution"
             value={`${reviewStats.resolutionPercent}%`}
             subtext={`${reviewStats.resolved} retries completed`}
             progress={reviewStats.resolutionPercent}
+            tone="coral"
           />
         </div>
       </section>
@@ -87,7 +93,16 @@ export function AnalyticsGrid() {
                 <p className="text-sm text-slate-400">{metric.avgTimeSec}s</p>
               </div>
               <div className="mt-3">
-                <ProgressBar value={metric.accuracy} />
+                <ProgressBar
+                  value={metric.accuracy}
+                  tone={
+                    metric.accuracy >= 80
+                      ? "success"
+                      : metric.accuracy >= 60
+                        ? "accent"
+                        : "warning"
+                  }
+                />
               </div>
             </div>
           ))}
@@ -101,19 +116,21 @@ function MetricCard({
   title,
   value,
   subtext,
-  progress
+  progress,
+  tone
 }: {
   title: string;
   value: string;
   subtext: string;
   progress: number;
+  tone: "accent" | "success" | "warning" | "coral";
 }) {
   return (
     <div className="rounded-[24px] border border-slate-800 bg-slate-950/60 p-5">
       <p className="text-sm text-slate-400">{title}</p>
       <p className="mt-2 text-3xl font-bold text-slate-100">{value}</p>
       <p className="mt-2 text-sm text-slate-400">{subtext}</p>
-      <ProgressBar value={progress} className="mt-4" />
+      <ProgressBar value={progress} tone={tone} className="mt-4" />
     </div>
   );
 }

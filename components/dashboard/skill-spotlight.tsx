@@ -9,11 +9,13 @@ import {
 } from "@/lib/mission-attempts-client";
 import { loadReviewItems, subscribeToReviewItemsSync, syncReviewItemsFromServer } from "@/lib/review-items-client";
 import { getSkillMetricsFromReviewItems } from "@/lib/review-insights";
+import { useStudyContent } from "@/lib/use-study-content";
 import type { MissionAttemptRecord, PersistedReviewItem } from "@/lib/types";
 
 export function SkillSpotlight() {
   const [reviewItems, setReviewItems] = useState<PersistedReviewItem[]>([]);
   const [attempts, setAttempts] = useState<MissionAttemptRecord[]>([]);
+  const { questions } = useStudyContent();
 
   useEffect(() => {
     function syncLocal() {
@@ -33,15 +35,15 @@ export function SkillSpotlight() {
   }, []);
 
   const metrics = useMemo(
-    () => getSkillMetricsFromReviewItems(reviewItems, attempts),
-    [reviewItems, attempts]
+    () => getSkillMetricsFromReviewItems(reviewItems, attempts, questions),
+    [reviewItems, attempts, questions]
   );
 
   return (
     <section className="panel rounded-[28px] p-6">
       <div className="mb-6">
         <p className="text-sm font-semibold text-slate-100">Skill spotlight</p>
-        <p className="text-sm text-slate-400">Starter analytics cards for the v1 dashboard and section-level mastery view.</p>
+        <p className="text-sm text-slate-400">A quick read on the skills that are holding up well and the ones still building consistency.</p>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
         {metrics.map((metric) => (
@@ -58,7 +60,16 @@ export function SkillSpotlight() {
                 <span>Recent accuracy</span>
                 <span>{metric.accuracy}%</span>
               </div>
-              <ProgressBar value={metric.accuracy} />
+              <ProgressBar
+                value={metric.accuracy}
+                tone={
+                  metric.backlog >= 3
+                    ? "warning"
+                    : metric.accuracy >= 80
+                      ? "success"
+                      : "accent"
+                }
+              />
             </div>
           </div>
         ))}

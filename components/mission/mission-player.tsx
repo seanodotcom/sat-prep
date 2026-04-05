@@ -1,18 +1,18 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { allMissionQuestions } from "@/data/mock-data";
 import { upsertMissionAttempt } from "@/lib/mission-attempts-client";
 import { upsertReviewItem } from "@/lib/review-items-client";
 import { Chip } from "@/components/ui/chip";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { defaultMissionProgress, type StoredMissionProgress } from "@/lib/storage";
-import type { MissionDayConfig, MissionQuestionSet, MissionStep } from "@/lib/types";
+import type { MissionDayConfig, MissionQuestionSet, MissionStep, Question } from "@/lib/types";
 
 export function MissionPlayer({
   currentDay,
   missionConfig,
+  questionCatalog,
   progress,
   questionSet,
   steps,
@@ -22,6 +22,7 @@ export function MissionPlayer({
 }: {
   currentDay: number;
   missionConfig: MissionDayConfig;
+  questionCatalog: Question[];
   progress: StoredMissionProgress;
   questionSet: MissionQuestionSet;
   steps: MissionStep[];
@@ -32,13 +33,13 @@ export function MissionPlayer({
   const [elapsedSec, setElapsedSec] = useState(0);
   const currentStep = steps[Math.min(progress.currentStepIndex, steps.length - 1)];
   const questions = questionSet.questions;
-  const reviewItems = allMissionQuestions.filter(
+  const reviewItems = questionCatalog.filter(
     (item) =>
       progress.reviewQuestionIds.includes(item.id) || progress.flaggedQuestionIds.includes(item.id)
   );
   const hasReviewItems = reviewItems.length > 0;
   const safeQuestionIndex = Math.min(progress.questionIndex, Math.max(questions.length - 1, 0));
-  const question = questions[safeQuestionIndex] ?? allMissionQuestions[0];
+  const question = questions[safeQuestionIndex] ?? questionCatalog[0];
   const isCorrect = progress.selectedChoice === question.answer;
   const isLast = progress.questionIndex === questions.length - 1;
   const completedQuestions = progress.answeredQuestionIds.length;
@@ -281,7 +282,7 @@ export function MissionPlayer({
             </div>
           ) : (
             <div className="mt-6 rounded-[24px] border border-dashed border-teal-400/35 bg-teal-500/6 p-5 text-sm text-slate-300">
-              Clean run. You didn't miss or flag anything in this prototype mission, so there's nothing waiting in the review queue.
+              Clean run. You didn't miss or flag anything in this mission, so there's nothing waiting in the review queue.
             </div>
           )}
 

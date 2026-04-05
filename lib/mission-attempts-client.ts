@@ -13,6 +13,10 @@ function saveMissionAttempts(attempts: MissionAttemptRecord[]) {
   window.localStorage.setItem(MISSION_ATTEMPTS_KEY, JSON.stringify(attempts));
 }
 
+export function clearStoredMissionAttempts() {
+  window.localStorage.removeItem(MISSION_ATTEMPTS_KEY);
+}
+
 export function loadMissionAttempts() {
   const stored = window.localStorage.getItem(MISSION_ATTEMPTS_KEY);
   if (!stored) return [] as MissionAttemptRecord[];
@@ -63,4 +67,19 @@ export async function upsertMissionAttempt(attempt: MissionAttemptRecord) {
   }
 
   return syncMissionAttemptsFromServer();
+}
+
+export async function clearMissionAttempts() {
+  clearStoredMissionAttempts();
+  emitMissionAttemptsSync();
+
+  const response = await fetch("/api/mission-attempts", {
+    method: "DELETE"
+  });
+
+  if (!response.ok) {
+    throw new Error("Unable to clear mission attempts");
+  }
+
+  return [] as MissionAttemptRecord[];
 }

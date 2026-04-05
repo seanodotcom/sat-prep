@@ -8,7 +8,7 @@ export default function ReviewPage() {
         <p className="text-sm font-semibold uppercase tracking-[0.24em] text-coral">Mistake review</p>
         <h1 className="mt-3 text-3xl font-bold text-slate-100">Close the loop before the same errors repeat.</h1>
         <p className="mt-3 max-w-3xl text-slate-400">
-          v1 centers review as a first-class screen. Each retry card connects the original miss to a clean error label so analytics, adaptivity, and learning all point at the same data.
+          Every retry card ties the original miss to a clear error label, so your review habits, analytics, and next steps all stay aligned.
         </p>
       </section>
       <SessionReview />

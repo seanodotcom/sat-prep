@@ -252,6 +252,8 @@ export type UserProfileWhereInput = {
   missionProgress?: Prisma.XOR<Prisma.MissionProgressNullableScalarRelationFilter, Prisma.MissionProgressWhereInput> | null
   reviewItems?: Prisma.ReviewItemListRelationFilter
   missionAttempts?: Prisma.MissionAttemptListRelationFilter
+  questions?: Prisma.QuestionContentListRelationFilter
+  planDays?: Prisma.PlanDayContentListRelationFilter
 }
 
 export type UserProfileOrderByWithRelationInput = {
@@ -267,6 +269,8 @@ export type UserProfileOrderByWithRelationInput = {
   missionProgress?: Prisma.MissionProgressOrderByWithRelationInput
   reviewItems?: Prisma.ReviewItemOrderByRelationAggregateInput
   missionAttempts?: Prisma.MissionAttemptOrderByRelationAggregateInput
+  questions?: Prisma.QuestionContentOrderByRelationAggregateInput
+  planDays?: Prisma.PlanDayContentOrderByRelationAggregateInput
 }
 
 export type UserProfileWhereUniqueInput = Prisma.AtLeast<{
@@ -285,6 +289,8 @@ export type UserProfileWhereUniqueInput = Prisma.AtLeast<{
   missionProgress?: Prisma.XOR<Prisma.MissionProgressNullableScalarRelationFilter, Prisma.MissionProgressWhereInput> | null
   reviewItems?: Prisma.ReviewItemListRelationFilter
   missionAttempts?: Prisma.MissionAttemptListRelationFilter
+  questions?: Prisma.QuestionContentListRelationFilter
+  planDays?: Prisma.PlanDayContentListRelationFilter
 }, "id">
 
 export type UserProfileOrderByWithAggregationInput = {
@@ -330,6 +336,8 @@ export type UserProfileCreateInput = {
   missionProgress?: Prisma.MissionProgressCreateNestedOneWithoutUserProfileInput
   reviewItems?: Prisma.ReviewItemCreateNestedManyWithoutUserProfileInput
   missionAttempts?: Prisma.MissionAttemptCreateNestedManyWithoutUserProfileInput
+  questions?: Prisma.QuestionContentCreateNestedManyWithoutUserProfileInput
+  planDays?: Prisma.PlanDayContentCreateNestedManyWithoutUserProfileInput
 }
 
 export type UserProfileUncheckedCreateInput = {
@@ -345,6 +353,8 @@ export type UserProfileUncheckedCreateInput = {
   missionProgress?: Prisma.MissionProgressUncheckedCreateNestedOneWithoutUserProfileInput
   reviewItems?: Prisma.ReviewItemUncheckedCreateNestedManyWithoutUserProfileInput
   missionAttempts?: Prisma.MissionAttemptUncheckedCreateNestedManyWithoutUserProfileInput
+  questions?: Prisma.QuestionContentUncheckedCreateNestedManyWithoutUserProfileInput
+  planDays?: Prisma.PlanDayContentUncheckedCreateNestedManyWithoutUserProfileInput
 }
 
 export type UserProfileUpdateInput = {
@@ -360,6 +370,8 @@ export type UserProfileUpdateInput = {
   missionProgress?: Prisma.MissionProgressUpdateOneWithoutUserProfileNestedInput
   reviewItems?: Prisma.ReviewItemUpdateManyWithoutUserProfileNestedInput
   missionAttempts?: Prisma.MissionAttemptUpdateManyWithoutUserProfileNestedInput
+  questions?: Prisma.QuestionContentUpdateManyWithoutUserProfileNestedInput
+  planDays?: Prisma.PlanDayContentUpdateManyWithoutUserProfileNestedInput
 }
 
 export type UserProfileUncheckedUpdateInput = {
@@ -375,6 +387,8 @@ export type UserProfileUncheckedUpdateInput = {
   missionProgress?: Prisma.MissionProgressUncheckedUpdateOneWithoutUserProfileNestedInput
   reviewItems?: Prisma.ReviewItemUncheckedUpdateManyWithoutUserProfileNestedInput
   missionAttempts?: Prisma.MissionAttemptUncheckedUpdateManyWithoutUserProfileNestedInput
+  questions?: Prisma.QuestionContentUncheckedUpdateManyWithoutUserProfileNestedInput
+  planDays?: Prisma.PlanDayContentUncheckedUpdateManyWithoutUserProfileNestedInput
 }
 
 export type UserProfileCreateManyInput = {
@@ -540,6 +554,34 @@ export type UserProfileUpdateOneRequiredWithoutMissionAttemptsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserProfileUpdateToOneWithWhereWithoutMissionAttemptsInput, Prisma.UserProfileUpdateWithoutMissionAttemptsInput>, Prisma.UserProfileUncheckedUpdateWithoutMissionAttemptsInput>
 }
 
+export type UserProfileCreateNestedOneWithoutQuestionsInput = {
+  create?: Prisma.XOR<Prisma.UserProfileCreateWithoutQuestionsInput, Prisma.UserProfileUncheckedCreateWithoutQuestionsInput>
+  connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutQuestionsInput
+  connect?: Prisma.UserProfileWhereUniqueInput
+}
+
+export type UserProfileUpdateOneRequiredWithoutQuestionsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserProfileCreateWithoutQuestionsInput, Prisma.UserProfileUncheckedCreateWithoutQuestionsInput>
+  connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutQuestionsInput
+  upsert?: Prisma.UserProfileUpsertWithoutQuestionsInput
+  connect?: Prisma.UserProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserProfileUpdateToOneWithWhereWithoutQuestionsInput, Prisma.UserProfileUpdateWithoutQuestionsInput>, Prisma.UserProfileUncheckedUpdateWithoutQuestionsInput>
+}
+
+export type UserProfileCreateNestedOneWithoutPlanDaysInput = {
+  create?: Prisma.XOR<Prisma.UserProfileCreateWithoutPlanDaysInput, Prisma.UserProfileUncheckedCreateWithoutPlanDaysInput>
+  connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutPlanDaysInput
+  connect?: Prisma.UserProfileWhereUniqueInput
+}
+
+export type UserProfileUpdateOneRequiredWithoutPlanDaysNestedInput = {
+  create?: Prisma.XOR<Prisma.UserProfileCreateWithoutPlanDaysInput, Prisma.UserProfileUncheckedCreateWithoutPlanDaysInput>
+  connectOrCreate?: Prisma.UserProfileCreateOrConnectWithoutPlanDaysInput
+  upsert?: Prisma.UserProfileUpsertWithoutPlanDaysInput
+  connect?: Prisma.UserProfileWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserProfileUpdateToOneWithWhereWithoutPlanDaysInput, Prisma.UserProfileUpdateWithoutPlanDaysInput>, Prisma.UserProfileUncheckedUpdateWithoutPlanDaysInput>
+}
+
 export type UserProfileCreateWithoutStudyProgressInput = {
   id?: number
   firstName?: string
@@ -552,6 +594,8 @@ export type UserProfileCreateWithoutStudyProgressInput = {
   missionProgress?: Prisma.MissionProgressCreateNestedOneWithoutUserProfileInput
   reviewItems?: Prisma.ReviewItemCreateNestedManyWithoutUserProfileInput
   missionAttempts?: Prisma.MissionAttemptCreateNestedManyWithoutUserProfileInput
+  questions?: Prisma.QuestionContentCreateNestedManyWithoutUserProfileInput
+  planDays?: Prisma.PlanDayContentCreateNestedManyWithoutUserProfileInput
 }
 
 export type UserProfileUncheckedCreateWithoutStudyProgressInput = {
@@ -566,6 +610,8 @@ export type UserProfileUncheckedCreateWithoutStudyProgressInput = {
   missionProgress?: Prisma.MissionProgressUncheckedCreateNestedOneWithoutUserProfileInput
   reviewItems?: Prisma.ReviewItemUncheckedCreateNestedManyWithoutUserProfileInput
   missionAttempts?: Prisma.MissionAttemptUncheckedCreateNestedManyWithoutUserProfileInput
+  questions?: Prisma.QuestionContentUncheckedCreateNestedManyWithoutUserProfileInput
+  planDays?: Prisma.PlanDayContentUncheckedCreateNestedManyWithoutUserProfileInput
 }
 
 export type UserProfileCreateOrConnectWithoutStudyProgressInput = {
@@ -596,6 +642,8 @@ export type UserProfileUpdateWithoutStudyProgressInput = {
   missionProgress?: Prisma.MissionProgressUpdateOneWithoutUserProfileNestedInput
   reviewItems?: Prisma.ReviewItemUpdateManyWithoutUserProfileNestedInput
   missionAttempts?: Prisma.MissionAttemptUpdateManyWithoutUserProfileNestedInput
+  questions?: Prisma.QuestionContentUpdateManyWithoutUserProfileNestedInput
+  planDays?: Prisma.PlanDayContentUpdateManyWithoutUserProfileNestedInput
 }
 
 export type UserProfileUncheckedUpdateWithoutStudyProgressInput = {
@@ -610,6 +658,8 @@ export type UserProfileUncheckedUpdateWithoutStudyProgressInput = {
   missionProgress?: Prisma.MissionProgressUncheckedUpdateOneWithoutUserProfileNestedInput
   reviewItems?: Prisma.ReviewItemUncheckedUpdateManyWithoutUserProfileNestedInput
   missionAttempts?: Prisma.MissionAttemptUncheckedUpdateManyWithoutUserProfileNestedInput
+  questions?: Prisma.QuestionContentUncheckedUpdateManyWithoutUserProfileNestedInput
+  planDays?: Prisma.PlanDayContentUncheckedUpdateManyWithoutUserProfileNestedInput
 }
 
 export type UserProfileCreateWithoutMissionProgressInput = {
@@ -624,6 +674,8 @@ export type UserProfileCreateWithoutMissionProgressInput = {
   studyProgress?: Prisma.StudyProgressCreateNestedOneWithoutUserProfileInput
   reviewItems?: Prisma.ReviewItemCreateNestedManyWithoutUserProfileInput
   missionAttempts?: Prisma.MissionAttemptCreateNestedManyWithoutUserProfileInput
+  questions?: Prisma.QuestionContentCreateNestedManyWithoutUserProfileInput
+  planDays?: Prisma.PlanDayContentCreateNestedManyWithoutUserProfileInput
 }
 
 export type UserProfileUncheckedCreateWithoutMissionProgressInput = {
@@ -638,6 +690,8 @@ export type UserProfileUncheckedCreateWithoutMissionProgressInput = {
   studyProgress?: Prisma.StudyProgressUncheckedCreateNestedOneWithoutUserProfileInput
   reviewItems?: Prisma.ReviewItemUncheckedCreateNestedManyWithoutUserProfileInput
   missionAttempts?: Prisma.MissionAttemptUncheckedCreateNestedManyWithoutUserProfileInput
+  questions?: Prisma.QuestionContentUncheckedCreateNestedManyWithoutUserProfileInput
+  planDays?: Prisma.PlanDayContentUncheckedCreateNestedManyWithoutUserProfileInput
 }
 
 export type UserProfileCreateOrConnectWithoutMissionProgressInput = {
@@ -668,6 +722,8 @@ export type UserProfileUpdateWithoutMissionProgressInput = {
   studyProgress?: Prisma.StudyProgressUpdateOneWithoutUserProfileNestedInput
   reviewItems?: Prisma.ReviewItemUpdateManyWithoutUserProfileNestedInput
   missionAttempts?: Prisma.MissionAttemptUpdateManyWithoutUserProfileNestedInput
+  questions?: Prisma.QuestionContentUpdateManyWithoutUserProfileNestedInput
+  planDays?: Prisma.PlanDayContentUpdateManyWithoutUserProfileNestedInput
 }
 
 export type UserProfileUncheckedUpdateWithoutMissionProgressInput = {
@@ -682,6 +738,8 @@ export type UserProfileUncheckedUpdateWithoutMissionProgressInput = {
   studyProgress?: Prisma.StudyProgressUncheckedUpdateOneWithoutUserProfileNestedInput
   reviewItems?: Prisma.ReviewItemUncheckedUpdateManyWithoutUserProfileNestedInput
   missionAttempts?: Prisma.MissionAttemptUncheckedUpdateManyWithoutUserProfileNestedInput
+  questions?: Prisma.QuestionContentUncheckedUpdateManyWithoutUserProfileNestedInput
+  planDays?: Prisma.PlanDayContentUncheckedUpdateManyWithoutUserProfileNestedInput
 }
 
 export type UserProfileCreateWithoutReviewItemsInput = {
@@ -696,6 +754,8 @@ export type UserProfileCreateWithoutReviewItemsInput = {
   studyProgress?: Prisma.StudyProgressCreateNestedOneWithoutUserProfileInput
   missionProgress?: Prisma.MissionProgressCreateNestedOneWithoutUserProfileInput
   missionAttempts?: Prisma.MissionAttemptCreateNestedManyWithoutUserProfileInput
+  questions?: Prisma.QuestionContentCreateNestedManyWithoutUserProfileInput
+  planDays?: Prisma.PlanDayContentCreateNestedManyWithoutUserProfileInput
 }
 
 export type UserProfileUncheckedCreateWithoutReviewItemsInput = {
@@ -710,6 +770,8 @@ export type UserProfileUncheckedCreateWithoutReviewItemsInput = {
   studyProgress?: Prisma.StudyProgressUncheckedCreateNestedOneWithoutUserProfileInput
   missionProgress?: Prisma.MissionProgressUncheckedCreateNestedOneWithoutUserProfileInput
   missionAttempts?: Prisma.MissionAttemptUncheckedCreateNestedManyWithoutUserProfileInput
+  questions?: Prisma.QuestionContentUncheckedCreateNestedManyWithoutUserProfileInput
+  planDays?: Prisma.PlanDayContentUncheckedCreateNestedManyWithoutUserProfileInput
 }
 
 export type UserProfileCreateOrConnectWithoutReviewItemsInput = {
@@ -740,6 +802,8 @@ export type UserProfileUpdateWithoutReviewItemsInput = {
   studyProgress?: Prisma.StudyProgressUpdateOneWithoutUserProfileNestedInput
   missionProgress?: Prisma.MissionProgressUpdateOneWithoutUserProfileNestedInput
   missionAttempts?: Prisma.MissionAttemptUpdateManyWithoutUserProfileNestedInput
+  questions?: Prisma.QuestionContentUpdateManyWithoutUserProfileNestedInput
+  planDays?: Prisma.PlanDayContentUpdateManyWithoutUserProfileNestedInput
 }
 
 export type UserProfileUncheckedUpdateWithoutReviewItemsInput = {
@@ -754,6 +818,8 @@ export type UserProfileUncheckedUpdateWithoutReviewItemsInput = {
   studyProgress?: Prisma.StudyProgressUncheckedUpdateOneWithoutUserProfileNestedInput
   missionProgress?: Prisma.MissionProgressUncheckedUpdateOneWithoutUserProfileNestedInput
   missionAttempts?: Prisma.MissionAttemptUncheckedUpdateManyWithoutUserProfileNestedInput
+  questions?: Prisma.QuestionContentUncheckedUpdateManyWithoutUserProfileNestedInput
+  planDays?: Prisma.PlanDayContentUncheckedUpdateManyWithoutUserProfileNestedInput
 }
 
 export type UserProfileCreateWithoutMissionAttemptsInput = {
@@ -768,6 +834,8 @@ export type UserProfileCreateWithoutMissionAttemptsInput = {
   studyProgress?: Prisma.StudyProgressCreateNestedOneWithoutUserProfileInput
   missionProgress?: Prisma.MissionProgressCreateNestedOneWithoutUserProfileInput
   reviewItems?: Prisma.ReviewItemCreateNestedManyWithoutUserProfileInput
+  questions?: Prisma.QuestionContentCreateNestedManyWithoutUserProfileInput
+  planDays?: Prisma.PlanDayContentCreateNestedManyWithoutUserProfileInput
 }
 
 export type UserProfileUncheckedCreateWithoutMissionAttemptsInput = {
@@ -782,6 +850,8 @@ export type UserProfileUncheckedCreateWithoutMissionAttemptsInput = {
   studyProgress?: Prisma.StudyProgressUncheckedCreateNestedOneWithoutUserProfileInput
   missionProgress?: Prisma.MissionProgressUncheckedCreateNestedOneWithoutUserProfileInput
   reviewItems?: Prisma.ReviewItemUncheckedCreateNestedManyWithoutUserProfileInput
+  questions?: Prisma.QuestionContentUncheckedCreateNestedManyWithoutUserProfileInput
+  planDays?: Prisma.PlanDayContentUncheckedCreateNestedManyWithoutUserProfileInput
 }
 
 export type UserProfileCreateOrConnectWithoutMissionAttemptsInput = {
@@ -812,6 +882,8 @@ export type UserProfileUpdateWithoutMissionAttemptsInput = {
   studyProgress?: Prisma.StudyProgressUpdateOneWithoutUserProfileNestedInput
   missionProgress?: Prisma.MissionProgressUpdateOneWithoutUserProfileNestedInput
   reviewItems?: Prisma.ReviewItemUpdateManyWithoutUserProfileNestedInput
+  questions?: Prisma.QuestionContentUpdateManyWithoutUserProfileNestedInput
+  planDays?: Prisma.PlanDayContentUpdateManyWithoutUserProfileNestedInput
 }
 
 export type UserProfileUncheckedUpdateWithoutMissionAttemptsInput = {
@@ -826,6 +898,168 @@ export type UserProfileUncheckedUpdateWithoutMissionAttemptsInput = {
   studyProgress?: Prisma.StudyProgressUncheckedUpdateOneWithoutUserProfileNestedInput
   missionProgress?: Prisma.MissionProgressUncheckedUpdateOneWithoutUserProfileNestedInput
   reviewItems?: Prisma.ReviewItemUncheckedUpdateManyWithoutUserProfileNestedInput
+  questions?: Prisma.QuestionContentUncheckedUpdateManyWithoutUserProfileNestedInput
+  planDays?: Prisma.PlanDayContentUncheckedUpdateManyWithoutUserProfileNestedInput
+}
+
+export type UserProfileCreateWithoutQuestionsInput = {
+  id?: number
+  firstName?: string
+  targetScore?: number
+  targetTestDate?: Date | string | null
+  preferredDailyMinutes?: number
+  focusSection?: $Enums.FocusSection
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  studyProgress?: Prisma.StudyProgressCreateNestedOneWithoutUserProfileInput
+  missionProgress?: Prisma.MissionProgressCreateNestedOneWithoutUserProfileInput
+  reviewItems?: Prisma.ReviewItemCreateNestedManyWithoutUserProfileInput
+  missionAttempts?: Prisma.MissionAttemptCreateNestedManyWithoutUserProfileInput
+  planDays?: Prisma.PlanDayContentCreateNestedManyWithoutUserProfileInput
+}
+
+export type UserProfileUncheckedCreateWithoutQuestionsInput = {
+  id?: number
+  firstName?: string
+  targetScore?: number
+  targetTestDate?: Date | string | null
+  preferredDailyMinutes?: number
+  focusSection?: $Enums.FocusSection
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  studyProgress?: Prisma.StudyProgressUncheckedCreateNestedOneWithoutUserProfileInput
+  missionProgress?: Prisma.MissionProgressUncheckedCreateNestedOneWithoutUserProfileInput
+  reviewItems?: Prisma.ReviewItemUncheckedCreateNestedManyWithoutUserProfileInput
+  missionAttempts?: Prisma.MissionAttemptUncheckedCreateNestedManyWithoutUserProfileInput
+  planDays?: Prisma.PlanDayContentUncheckedCreateNestedManyWithoutUserProfileInput
+}
+
+export type UserProfileCreateOrConnectWithoutQuestionsInput = {
+  where: Prisma.UserProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserProfileCreateWithoutQuestionsInput, Prisma.UserProfileUncheckedCreateWithoutQuestionsInput>
+}
+
+export type UserProfileUpsertWithoutQuestionsInput = {
+  update: Prisma.XOR<Prisma.UserProfileUpdateWithoutQuestionsInput, Prisma.UserProfileUncheckedUpdateWithoutQuestionsInput>
+  create: Prisma.XOR<Prisma.UserProfileCreateWithoutQuestionsInput, Prisma.UserProfileUncheckedCreateWithoutQuestionsInput>
+  where?: Prisma.UserProfileWhereInput
+}
+
+export type UserProfileUpdateToOneWithWhereWithoutQuestionsInput = {
+  where?: Prisma.UserProfileWhereInput
+  data: Prisma.XOR<Prisma.UserProfileUpdateWithoutQuestionsInput, Prisma.UserProfileUncheckedUpdateWithoutQuestionsInput>
+}
+
+export type UserProfileUpdateWithoutQuestionsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  targetScore?: Prisma.IntFieldUpdateOperationsInput | number
+  targetTestDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preferredDailyMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  focusSection?: Prisma.EnumFocusSectionFieldUpdateOperationsInput | $Enums.FocusSection
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  studyProgress?: Prisma.StudyProgressUpdateOneWithoutUserProfileNestedInput
+  missionProgress?: Prisma.MissionProgressUpdateOneWithoutUserProfileNestedInput
+  reviewItems?: Prisma.ReviewItemUpdateManyWithoutUserProfileNestedInput
+  missionAttempts?: Prisma.MissionAttemptUpdateManyWithoutUserProfileNestedInput
+  planDays?: Prisma.PlanDayContentUpdateManyWithoutUserProfileNestedInput
+}
+
+export type UserProfileUncheckedUpdateWithoutQuestionsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  targetScore?: Prisma.IntFieldUpdateOperationsInput | number
+  targetTestDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preferredDailyMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  focusSection?: Prisma.EnumFocusSectionFieldUpdateOperationsInput | $Enums.FocusSection
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  studyProgress?: Prisma.StudyProgressUncheckedUpdateOneWithoutUserProfileNestedInput
+  missionProgress?: Prisma.MissionProgressUncheckedUpdateOneWithoutUserProfileNestedInput
+  reviewItems?: Prisma.ReviewItemUncheckedUpdateManyWithoutUserProfileNestedInput
+  missionAttempts?: Prisma.MissionAttemptUncheckedUpdateManyWithoutUserProfileNestedInput
+  planDays?: Prisma.PlanDayContentUncheckedUpdateManyWithoutUserProfileNestedInput
+}
+
+export type UserProfileCreateWithoutPlanDaysInput = {
+  id?: number
+  firstName?: string
+  targetScore?: number
+  targetTestDate?: Date | string | null
+  preferredDailyMinutes?: number
+  focusSection?: $Enums.FocusSection
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  studyProgress?: Prisma.StudyProgressCreateNestedOneWithoutUserProfileInput
+  missionProgress?: Prisma.MissionProgressCreateNestedOneWithoutUserProfileInput
+  reviewItems?: Prisma.ReviewItemCreateNestedManyWithoutUserProfileInput
+  missionAttempts?: Prisma.MissionAttemptCreateNestedManyWithoutUserProfileInput
+  questions?: Prisma.QuestionContentCreateNestedManyWithoutUserProfileInput
+}
+
+export type UserProfileUncheckedCreateWithoutPlanDaysInput = {
+  id?: number
+  firstName?: string
+  targetScore?: number
+  targetTestDate?: Date | string | null
+  preferredDailyMinutes?: number
+  focusSection?: $Enums.FocusSection
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  studyProgress?: Prisma.StudyProgressUncheckedCreateNestedOneWithoutUserProfileInput
+  missionProgress?: Prisma.MissionProgressUncheckedCreateNestedOneWithoutUserProfileInput
+  reviewItems?: Prisma.ReviewItemUncheckedCreateNestedManyWithoutUserProfileInput
+  missionAttempts?: Prisma.MissionAttemptUncheckedCreateNestedManyWithoutUserProfileInput
+  questions?: Prisma.QuestionContentUncheckedCreateNestedManyWithoutUserProfileInput
+}
+
+export type UserProfileCreateOrConnectWithoutPlanDaysInput = {
+  where: Prisma.UserProfileWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserProfileCreateWithoutPlanDaysInput, Prisma.UserProfileUncheckedCreateWithoutPlanDaysInput>
+}
+
+export type UserProfileUpsertWithoutPlanDaysInput = {
+  update: Prisma.XOR<Prisma.UserProfileUpdateWithoutPlanDaysInput, Prisma.UserProfileUncheckedUpdateWithoutPlanDaysInput>
+  create: Prisma.XOR<Prisma.UserProfileCreateWithoutPlanDaysInput, Prisma.UserProfileUncheckedCreateWithoutPlanDaysInput>
+  where?: Prisma.UserProfileWhereInput
+}
+
+export type UserProfileUpdateToOneWithWhereWithoutPlanDaysInput = {
+  where?: Prisma.UserProfileWhereInput
+  data: Prisma.XOR<Prisma.UserProfileUpdateWithoutPlanDaysInput, Prisma.UserProfileUncheckedUpdateWithoutPlanDaysInput>
+}
+
+export type UserProfileUpdateWithoutPlanDaysInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  targetScore?: Prisma.IntFieldUpdateOperationsInput | number
+  targetTestDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preferredDailyMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  focusSection?: Prisma.EnumFocusSectionFieldUpdateOperationsInput | $Enums.FocusSection
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  studyProgress?: Prisma.StudyProgressUpdateOneWithoutUserProfileNestedInput
+  missionProgress?: Prisma.MissionProgressUpdateOneWithoutUserProfileNestedInput
+  reviewItems?: Prisma.ReviewItemUpdateManyWithoutUserProfileNestedInput
+  missionAttempts?: Prisma.MissionAttemptUpdateManyWithoutUserProfileNestedInput
+  questions?: Prisma.QuestionContentUpdateManyWithoutUserProfileNestedInput
+}
+
+export type UserProfileUncheckedUpdateWithoutPlanDaysInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  targetScore?: Prisma.IntFieldUpdateOperationsInput | number
+  targetTestDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  preferredDailyMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  focusSection?: Prisma.EnumFocusSectionFieldUpdateOperationsInput | $Enums.FocusSection
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  studyProgress?: Prisma.StudyProgressUncheckedUpdateOneWithoutUserProfileNestedInput
+  missionProgress?: Prisma.MissionProgressUncheckedUpdateOneWithoutUserProfileNestedInput
+  reviewItems?: Prisma.ReviewItemUncheckedUpdateManyWithoutUserProfileNestedInput
+  missionAttempts?: Prisma.MissionAttemptUncheckedUpdateManyWithoutUserProfileNestedInput
+  questions?: Prisma.QuestionContentUncheckedUpdateManyWithoutUserProfileNestedInput
 }
 
 
@@ -836,11 +1070,15 @@ export type UserProfileUncheckedUpdateWithoutMissionAttemptsInput = {
 export type UserProfileCountOutputType = {
   reviewItems: number
   missionAttempts: number
+  questions: number
+  planDays: number
 }
 
 export type UserProfileCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   reviewItems?: boolean | UserProfileCountOutputTypeCountReviewItemsArgs
   missionAttempts?: boolean | UserProfileCountOutputTypeCountMissionAttemptsArgs
+  questions?: boolean | UserProfileCountOutputTypeCountQuestionsArgs
+  planDays?: boolean | UserProfileCountOutputTypeCountPlanDaysArgs
 }
 
 /**
@@ -867,6 +1105,20 @@ export type UserProfileCountOutputTypeCountMissionAttemptsArgs<ExtArgs extends r
   where?: Prisma.MissionAttemptWhereInput
 }
 
+/**
+ * UserProfileCountOutputType without action
+ */
+export type UserProfileCountOutputTypeCountQuestionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.QuestionContentWhereInput
+}
+
+/**
+ * UserProfileCountOutputType without action
+ */
+export type UserProfileCountOutputTypeCountPlanDaysArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PlanDayContentWhereInput
+}
+
 
 export type UserProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -881,6 +1133,8 @@ export type UserProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   missionProgress?: boolean | Prisma.UserProfile$missionProgressArgs<ExtArgs>
   reviewItems?: boolean | Prisma.UserProfile$reviewItemsArgs<ExtArgs>
   missionAttempts?: boolean | Prisma.UserProfile$missionAttemptsArgs<ExtArgs>
+  questions?: boolean | Prisma.UserProfile$questionsArgs<ExtArgs>
+  planDays?: boolean | Prisma.UserProfile$planDaysArgs<ExtArgs>
   _count?: boolean | Prisma.UserProfileCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userProfile"]>
 
@@ -923,6 +1177,8 @@ export type UserProfileInclude<ExtArgs extends runtime.Types.Extensions.Internal
   missionProgress?: boolean | Prisma.UserProfile$missionProgressArgs<ExtArgs>
   reviewItems?: boolean | Prisma.UserProfile$reviewItemsArgs<ExtArgs>
   missionAttempts?: boolean | Prisma.UserProfile$missionAttemptsArgs<ExtArgs>
+  questions?: boolean | Prisma.UserProfile$questionsArgs<ExtArgs>
+  planDays?: boolean | Prisma.UserProfile$planDaysArgs<ExtArgs>
   _count?: boolean | Prisma.UserProfileCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserProfileIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -935,6 +1191,8 @@ export type $UserProfilePayload<ExtArgs extends runtime.Types.Extensions.Interna
     missionProgress: Prisma.$MissionProgressPayload<ExtArgs> | null
     reviewItems: Prisma.$ReviewItemPayload<ExtArgs>[]
     missionAttempts: Prisma.$MissionAttemptPayload<ExtArgs>[]
+    questions: Prisma.$QuestionContentPayload<ExtArgs>[]
+    planDays: Prisma.$PlanDayContentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1343,6 +1601,8 @@ export interface Prisma__UserProfileClient<T, Null = never, ExtArgs extends runt
   missionProgress<T extends Prisma.UserProfile$missionProgressArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$missionProgressArgs<ExtArgs>>): Prisma.Prisma__MissionProgressClient<runtime.Types.Result.GetResult<Prisma.$MissionProgressPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   reviewItems<T extends Prisma.UserProfile$reviewItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$reviewItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReviewItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   missionAttempts<T extends Prisma.UserProfile$missionAttemptsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$missionAttemptsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MissionAttemptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  questions<T extends Prisma.UserProfile$questionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$questionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$QuestionContentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  planDays<T extends Prisma.UserProfile$planDaysArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserProfile$planDaysArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlanDayContentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1851,6 +2111,54 @@ export type UserProfile$missionAttemptsArgs<ExtArgs extends runtime.Types.Extens
   take?: number
   skip?: number
   distinct?: Prisma.MissionAttemptScalarFieldEnum | Prisma.MissionAttemptScalarFieldEnum[]
+}
+
+/**
+ * UserProfile.questions
+ */
+export type UserProfile$questionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the QuestionContent
+   */
+  select?: Prisma.QuestionContentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the QuestionContent
+   */
+  omit?: Prisma.QuestionContentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.QuestionContentInclude<ExtArgs> | null
+  where?: Prisma.QuestionContentWhereInput
+  orderBy?: Prisma.QuestionContentOrderByWithRelationInput | Prisma.QuestionContentOrderByWithRelationInput[]
+  cursor?: Prisma.QuestionContentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.QuestionContentScalarFieldEnum | Prisma.QuestionContentScalarFieldEnum[]
+}
+
+/**
+ * UserProfile.planDays
+ */
+export type UserProfile$planDaysArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PlanDayContent
+   */
+  select?: Prisma.PlanDayContentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PlanDayContent
+   */
+  omit?: Prisma.PlanDayContentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PlanDayContentInclude<ExtArgs> | null
+  where?: Prisma.PlanDayContentWhereInput
+  orderBy?: Prisma.PlanDayContentOrderByWithRelationInput | Prisma.PlanDayContentOrderByWithRelationInput[]
+  cursor?: Prisma.PlanDayContentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PlanDayContentScalarFieldEnum | Prisma.PlanDayContentScalarFieldEnum[]
 }
 
 /**

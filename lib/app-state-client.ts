@@ -20,6 +20,10 @@ export type ClientAppState = {
   missionProgress: StoredMissionProgress;
 };
 
+function isEqual<T>(left: T, right: T) {
+  return JSON.stringify(left) === JSON.stringify(right);
+}
+
 function emitAppStateSync() {
   window.dispatchEvent(new Event(APP_STATE_SYNC_EVENT));
 }
@@ -70,15 +74,36 @@ export async function syncAppStateFromServer() {
   }
 
   const data = (await response.json()) as ClientAppState;
-  saveOnboardingPreferences(data.onboardingPreferences);
-  saveStudyProgress(data.studyProgress);
-  saveMissionProgress(data.missionProgress);
-  emitAppStateSync();
+  const current = readClientAppState();
+
+  if (!isEqual(current.onboardingPreferences, data.onboardingPreferences)) {
+    saveOnboardingPreferences(data.onboardingPreferences);
+  }
+
+  if (!isEqual(current.studyProgress, data.studyProgress)) {
+    saveStudyProgress(data.studyProgress);
+  }
+
+  if (!isEqual(current.missionProgress, data.missionProgress)) {
+    saveMissionProgress(data.missionProgress);
+  }
+
+  if (
+    !isEqual(current.onboardingPreferences, data.onboardingPreferences) ||
+    !isEqual(current.studyProgress, data.studyProgress) ||
+    !isEqual(current.missionProgress, data.missionProgress)
+  ) {
+    emitAppStateSync();
+  }
 
   return data;
 }
 
 export async function persistOnboardingPreferences(value: OnboardingPreferences) {
+  if (isEqual(loadOnboardingPreferences(), value)) {
+    return readClientAppState();
+  }
+
   saveOnboardingPreferences(value);
   emitAppStateSync();
 
@@ -88,6 +113,10 @@ export async function persistOnboardingPreferences(value: OnboardingPreferences)
 }
 
 export async function persistStudyProgress(value: StudyProgress) {
+  if (isEqual(loadStudyProgress(), value)) {
+    return readClientAppState();
+  }
+
   saveStudyProgress(value);
   emitAppStateSync();
 
@@ -97,6 +126,10 @@ export async function persistStudyProgress(value: StudyProgress) {
 }
 
 export async function persistMissionProgress(value: StoredMissionProgress) {
+  if (isEqual(loadMissionProgress(), value)) {
+    return readClientAppState();
+  }
+
   saveMissionProgress(value);
   emitAppStateSync();
 

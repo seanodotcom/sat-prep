@@ -26,6 +26,8 @@ model UserProfile {
   missionProgress       MissionProgress?
   reviewItems           ReviewItem[]
   missionAttempts       MissionAttempt[]
+  questions             QuestionContent[]
+  planDays              PlanDayContent[]
 }
 
 model StudyProgress {
@@ -88,4 +90,41 @@ model MissionAttempt {
 
   @@index([userProfileId, day])
   @@index([userProfileId, questionId])
+}
+
+model QuestionContent {
+  id               String      @id
+  section          String
+  domain           String
+  skill            String
+  difficulty       Int
+  prompt           String
+  choices          Json
+  answer           String
+  explanation      String
+  estimatedTimeSec Int         @default(60)
+  errorTags        Json
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  userProfileId    Int         @default(1)
+  userProfile      UserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+
+  @@index([userProfileId, section])
+  @@index([userProfileId, skill])
+}
+
+model PlanDayContent {
+  day           Int         @id
+  title         String
+  focus         String
+  missionType   String
+  duration      String
+  rationale     String
+  missionConfig Json
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  userProfileId Int         @default(1)
+  userProfile   UserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+
+  @@index([userProfileId, day])
 }

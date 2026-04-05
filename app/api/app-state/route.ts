@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { readAppStateFromDb, updateAppStateInDb } from "@/lib/app-state-db";
+import { readAppStateFromDb, resetAppStateInDb, updateAppStateInDb } from "@/lib/app-state-db";
 
 export const runtime = "nodejs";
 
@@ -21,5 +21,10 @@ export async function PUT(request: Request) {
     missionProgress: body.missionProgress
   });
 
+  return NextResponse.json(nextState);
+}
+
+export async function DELETE() {
+  const nextState = await resetAppStateInDb();
   return NextResponse.json(nextState);
 }

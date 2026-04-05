@@ -56,3 +56,9 @@ export async function readMissionAttemptsFromDb() {
     createdAt: attempt.createdAt.toISOString()
   })) satisfies MissionAttemptRecord[];
 }
+
+export async function clearMissionAttemptsInDb() {
+  await prisma.missionAttempt.deleteMany({
+    where: { userProfileId: 1 }
+  });
+}

@@ -10,12 +10,14 @@ import { loadReviewItems, subscribeToReviewItemsSync, syncReviewItemsFromServer 
 import { readClientAppState, subscribeToAppStateSync, syncAppStateFromServer } from "@/lib/app-state-client";
 import { getReadinessGain, getWeeklyCompletion, getXpFromAttemptsAndReviews } from "@/lib/rewards-insights";
 import { defaultStudyProgress, type StudyProgress } from "@/lib/storage";
+import { useStudyContent } from "@/lib/use-study-content";
 import type { MissionAttemptRecord, PersistedReviewItem } from "@/lib/types";
 
 export function RewardsSummary() {
   const [attempts, setAttempts] = useState<MissionAttemptRecord[]>([]);
   const [reviewItems, setReviewItems] = useState<PersistedReviewItem[]>([]);
   const [studyProgress, setStudyProgress] = useState<StudyProgress>(defaultStudyProgress);
+  const { planDays } = useStudyContent();
 
   useEffect(() => {
     function syncLocal() {
@@ -41,7 +43,10 @@ export function RewardsSummary() {
   }, []);
 
   const xp = useMemo(() => getXpFromAttemptsAndReviews(attempts, reviewItems), [attempts, reviewItems]);
-  const weeklyCompletion = useMemo(() => getWeeklyCompletion(studyProgress), [studyProgress]);
+  const weeklyCompletion = useMemo(
+    () => getWeeklyCompletion(studyProgress, planDays),
+    [planDays, studyProgress]
+  );
   const readinessGain = useMemo(
     () => getReadinessGain(attempts, reviewItems),
     [attempts, reviewItems]

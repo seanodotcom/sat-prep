@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { allMissionQuestions } from "@/data/mock-data";
 import {
   loadMissionAttempts,
   subscribeToMissionAttemptsSync,
@@ -9,6 +8,7 @@ import {
 } from "@/lib/mission-attempts-client";
 import { getAveragePace } from "@/lib/attempt-insights";
 import { Chip } from "@/components/ui/chip";
+import { useStudyContent } from "@/lib/use-study-content";
 import type { MissionAttemptRecord } from "@/lib/types";
 
 function formatStep(stepId: string) {
@@ -21,6 +21,7 @@ function formatStep(stepId: string) {
 
 export function QuestionHistory() {
   const [attempts, setAttempts] = useState<MissionAttemptRecord[]>([]);
+  const { questions } = useStudyContent();
 
   useEffect(() => {
     function syncLocal() {
@@ -82,7 +83,7 @@ export function QuestionHistory() {
         {sortedAttempts.length ? (
           <div className="mt-5 grid gap-4">
             {sortedAttempts.map((attempt) => {
-              const question = allMissionQuestions.find((item) => item.id === attempt.questionId);
+              const question = questions.find((item) => item.id === attempt.questionId);
               const createdLabel = attempt.createdAt
                 ? new Date(attempt.createdAt).toLocaleString("en-US", {
                     month: "short",

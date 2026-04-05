@@ -2,21 +2,22 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { readClientAppState, subscribeToAppStateSync, syncAppStateFromServer } from "@/lib/app-state-client";
-import { dayPlan, getMissionDayConfig } from "@/data/mock-data";
 import { Button } from "@/components/ui/button";
 import { Chip } from "@/components/ui/chip";
 import { ProgressBar } from "@/components/ui/progress";
-import { getCurrentDayProgress, getDayRationale, getUpcomingDayPreview } from "@/lib/mission";
+import { hydrateMissionConfig } from "@/lib/content";
+import { getCurrentDayProgressFromPlan, getDayRationaleFromPlan, getUpcomingDayPreviewFromPlan } from "@/lib/mission";
 import {
   defaultStudyProgress,
-  loadStudyProgress,
   type StudyProgress
 } from "@/lib/storage";
 import { cn } from "@/lib/utils";
+import { useStudyContent } from "@/lib/use-study-content";
 
 export function PlanCalendar() {
   const [studyProgress, setStudyProgress] = useState<StudyProgress>(defaultStudyProgress);
   const [selectedDay, setSelectedDay] = useState<number>(defaultStudyProgress.currentDay);
+  const { questions, planDays } = useStudyContent();
 
   useEffect(() => {
     function syncFromClientState() {
@@ -35,24 +36,36 @@ export function PlanCalendar() {
     return subscribeToAppStateSync(syncFromClientState);
   }, []);
 
-  const dayProgress = useMemo(() => getCurrentDayProgress(studyProgress), [studyProgress]);
-  const upcomingDay = useMemo(() => getUpcomingDayPreview(studyProgress), [studyProgress]);
-  const completedCount = studyProgress.completedDays.length;
-  const checkpointDays = dayPlan.filter((item) => item.missionType === "Checkpoint").map((item) => item.day);
-  const completedCheckpoints = checkpointDays.filter((day) => studyProgress.completedDays.includes(day)).length;
-  const todayRationale = useMemo(() => getDayRationale(dayProgress.currentDay), [dayProgress.currentDay]);
-  const selectedPlanDay = dayPlan.find((item) => item.day === selectedDay) ?? dayProgress.currentPlan;
-  const selectedMissionConfig = useMemo(
-    () => getMissionDayConfig(selectedPlanDay.day, selectedPlanDay),
-    [selectedPlanDay]
+  const dayProgress = useMemo(
+    () => getCurrentDayProgressFromPlan(studyProgress, planDays),
+    [planDays, studyProgress]
   );
-  const selectedRationale = useMemo(() => getDayRationale(selectedPlanDay.day), [selectedPlanDay.day]);
+  const upcomingDay = useMemo(
+    () => getUpcomingDayPreviewFromPlan(studyProgress, planDays),
+    [planDays, studyProgress]
+  );
+  const completedCount = studyProgress.completedDays.length;
+  const checkpointDays = planDays.filter((item) => item.missionType === "Checkpoint").map((item) => item.day);
+  const completedCheckpoints = checkpointDays.filter((day) => studyProgress.completedDays.includes(day)).length;
+  const todayRationale = useMemo(
+    () => getDayRationaleFromPlan(dayProgress.currentDay, planDays),
+    [dayProgress.currentDay, planDays]
+  );
+  const selectedPlanDay = planDays.find((item) => item.day === selectedDay) ?? dayProgress.currentPlan;
+  const selectedMissionConfig = useMemo(
+    () => hydrateMissionConfig(selectedPlanDay, questions),
+    [questions, selectedPlanDay]
+  );
+  const selectedRationale = useMemo(
+    () => getDayRationaleFromPlan(selectedPlanDay.day, planDays),
+    [planDays, selectedPlanDay.day]
+  );
   const selectedQuestionCount = selectedMissionConfig.questionSets.reduce(
     (total, set) => total + set.questions.length,
     0
   );
 
-  const visiblePlan = dayPlan.map((item) => ({
+  const visiblePlan = planDays.map((item) => ({
     ...item,
     liveStatus: studyProgress.completedDays.includes(item.day)
       ? "complete"
@@ -74,7 +87,7 @@ export function PlanCalendar() {
           </p>
 
           <div className="mt-6 grid gap-4 md:grid-cols-3">
-            <PlanStat label="Days completed" value={`${completedCount} / ${dayPlan.length}`} tone="success" />
+            <PlanStat label="Days completed" value={`${completedCount} / ${planDays.length}`} tone="success" />
             <PlanStat label="Current day" value={`Day ${dayProgress.currentDay}`} tone="accent" />
             <PlanStat label="Checkpoints cleared" value={`${completedCheckpoints} / ${checkpointDays.length}`} tone="warning" />
           </div>
@@ -84,7 +97,16 @@ export function PlanCalendar() {
               <span>Plan progress</span>
               <span className="font-semibold text-slate-200">{dayProgress.progressPercent}%</span>
             </div>
-            <ProgressBar value={dayProgress.progressPercent} />
+            <ProgressBar
+              value={dayProgress.progressPercent}
+              tone={
+                dayProgress.progressPercent >= 100
+                  ? "success"
+                  : dayProgress.progressPercent >= 50
+                    ? "accent"
+                    : "warning"
+              }
+            />
             <p className="mt-4 text-sm leading-6 text-slate-300">{todayRationale}</p>
           </div>
         </div>

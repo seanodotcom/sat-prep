@@ -35,7 +35,10 @@ export function MissionSidebar({
             <span>{completedSteps} of {steps.length} complete</span>
             <span className="font-semibold text-slate-200">{progressValue}%</span>
           </div>
-          <ProgressBar value={progressValue} />
+          <ProgressBar
+            value={progressValue}
+            tone={progressValue >= 100 ? "success" : completedSteps > 0 ? "accent" : "slate"}
+          />
           <div className="mt-4 flex flex-wrap gap-2">
             {steps.map((step, index) => (
               <span

@@ -11,11 +11,13 @@ import { getCurrentStreak, getQuestionsSolved } from "@/lib/dashboard-insights";
 import { ProgressBar } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import {
-  getCurrentDayProgress,
   getDayRationale,
   getMissionSnapshot,
-  getUpcomingDayPreview
+  getCurrentDayProgressFromPlan,
+  getDayRationaleFromPlan,
+  getUpcomingDayPreviewFromPlan
 } from "@/lib/mission";
+import { useStudyContent } from "@/lib/use-study-content";
 import {
   defaultOnboardingPreferences,
   defaultMissionProgress,
@@ -32,6 +34,7 @@ export function HeroCard() {
   const [studyProgress, setStudyProgress] = useState<StudyProgress>(defaultStudyProgress);
   const [attempts, setAttempts] = useState<MissionAttemptRecord[]>([]);
   const [hydrated, setHydrated] = useState(false);
+  const { planDays } = useStudyContent();
 
   useEffect(() => {
     function syncFromClientState() {
@@ -70,12 +73,21 @@ export function HeroCard() {
   }, []);
 
   const snapshot = useMemo(() => getMissionSnapshot(progress), [progress]);
-  const dayProgress = useMemo(() => getCurrentDayProgress(studyProgress), [studyProgress]);
-  const upcomingDay = useMemo(() => getUpcomingDayPreview(studyProgress), [studyProgress]);
+  const dayProgress = useMemo(
+    () => getCurrentDayProgressFromPlan(studyProgress, planDays),
+    [planDays, studyProgress]
+  );
+  const upcomingDay = useMemo(
+    () => getUpcomingDayPreviewFromPlan(studyProgress, planDays),
+    [planDays, studyProgress]
+  );
   const streakDays = useMemo(() => getCurrentStreak(studyProgress), [studyProgress]);
   const questionsSolved = useMemo(() => getQuestionsSolved(attempts), [attempts]);
   const missionComplete = snapshot.completedSteps >= snapshot.totalSteps;
-  const dayRationale = useMemo(() => getDayRationale(dayProgress.currentDay), [dayProgress.currentDay]);
+  const dayRationale = useMemo(
+    () => getDayRationaleFromPlan(dayProgress.currentDay, planDays),
+    [dayProgress.currentDay, planDays]
+  );
   const completedDayLabel = missionComplete
     ? upcomingDay.hasUpcomingDay
       ? Math.max(1, dayProgress.currentDay - 1)
@@ -147,7 +159,10 @@ export function HeroCard() {
               <span>Mission flow progress</span>
               <span>{snapshot.flowPercent}% complete</span>
             </div>
-            <ProgressBar value={snapshot.flowPercent} />
+            <ProgressBar
+              value={snapshot.flowPercent}
+              tone={missionComplete ? "success" : snapshot.flowPercent >= 60 ? "accent" : "warning"}
+            />
           </div>
         </div>
         <div className="space-y-4">

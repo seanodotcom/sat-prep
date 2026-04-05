@@ -117,3 +117,9 @@ export async function clearActiveReviewItemsInDb() {
     }
   });
 }
+
+export async function clearAllReviewItemsInDb() {
+  await prisma.reviewItem.deleteMany({
+    where: { userProfileId: 1 }
+  });
+}

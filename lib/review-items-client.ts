@@ -13,6 +13,10 @@ function saveReviewItems(items: PersistedReviewItem[]) {
   window.localStorage.setItem(REVIEW_ITEMS_KEY, JSON.stringify(items));
 }
 
+export function clearStoredReviewItems() {
+  window.localStorage.removeItem(REVIEW_ITEMS_KEY);
+}
+
 export function loadReviewItems(): PersistedReviewItem[] {
   const stored = window.localStorage.getItem(REVIEW_ITEMS_KEY);
   if (!stored) return [];
@@ -95,6 +99,21 @@ export async function clearSessionReviewItems() {
   }
 
   return syncReviewItemsFromServer();
+}
+
+export async function clearAllReviewItems() {
+  clearStoredReviewItems();
+  emitReviewItemsSync();
+
+  const response = await fetch("/api/review-items?scope=all", {
+    method: "DELETE"
+  });
+
+  if (!response.ok) {
+    throw new Error("Unable to clear review items");
+  }
+
+  return [] as PersistedReviewItem[];
 }
 
 export async function resolveReviewItem(item: PersistedReviewItem) {

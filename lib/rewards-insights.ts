@@ -1,8 +1,9 @@
-import { dayPlan } from "@/data/mock-data";
+import { seedPlanDays } from "@/lib/content-seeds";
 import { getCurrentStreak } from "@/lib/dashboard-insights";
 import { getReviewResolutionStats } from "@/lib/review-insights";
 import type {
   MissionAttemptRecord,
+  PlanDayContent,
   PersistedReviewItem,
   RewardBadge
 } from "@/lib/types";
@@ -17,9 +18,12 @@ export function getXpFromAttemptsAndReviews(
   return correctAttempts * 10 + resolvedReviews * 20;
 }
 
-export function getWeeklyCompletion(studyProgress: StudyProgress) {
+export function getWeeklyCompletion(
+  studyProgress: StudyProgress,
+  planDays: PlanDayContent[] = seedPlanDays
+) {
   const completedThisWeek = studyProgress.completedDays.filter((day) => day >= 1 && day <= 7).length;
-  return Math.round((completedThisWeek / Math.min(7, dayPlan.length)) * 100);
+  return Math.round((completedThisWeek / Math.min(7, planDays.length)) * 100);
 }
 
 export function getReadinessGain(attempts: MissionAttemptRecord[], reviewItems: PersistedReviewItem[]) {

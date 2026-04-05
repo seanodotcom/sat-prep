@@ -159,3 +159,76 @@ export async function updateAppStateInDb(partial: Partial<AppStateRecord>) {
 
   return readAppStateFromDb();
 }
+
+export async function resetAppStateInDb() {
+  await prisma.$transaction(async (tx) => {
+    await tx.reviewItem.deleteMany({
+      where: { userProfileId: 1 }
+    });
+
+    await tx.missionAttempt.deleteMany({
+      where: { userProfileId: 1 }
+    });
+
+    await tx.userProfile.upsert({
+      where: { id: 1 },
+      update: {
+        firstName: defaultOnboardingPreferences.firstName,
+        targetScore: defaultOnboardingPreferences.targetScore,
+        targetTestDate: null,
+        preferredDailyMinutes: defaultOnboardingPreferences.preferredDailyMinutes,
+        focusSection: toFocusSection(defaultOnboardingPreferences.focusSection)
+      },
+      create: {
+        id: 1,
+        firstName: defaultOnboardingPreferences.firstName,
+        targetScore: defaultOnboardingPreferences.targetScore,
+        targetTestDate: null,
+        preferredDailyMinutes: defaultOnboardingPreferences.preferredDailyMinutes,
+        focusSection: toFocusSection(defaultOnboardingPreferences.focusSection)
+      }
+    });
+
+    await tx.studyProgress.upsert({
+      where: { id: 1 },
+      update: {
+        currentDay: defaultStudyProgress.currentDay,
+        completedDays: defaultStudyProgress.completedDays
+      },
+      create: {
+        id: 1,
+        currentDay: defaultStudyProgress.currentDay,
+        completedDays: defaultStudyProgress.completedDays,
+        userProfileId: 1
+      }
+    });
+
+    await tx.missionProgress.upsert({
+      where: { id: 1 },
+      update: {
+        currentStepIndex: defaultMissionProgress.currentStepIndex,
+        questionIndex: defaultMissionProgress.questionIndex,
+        selectedChoice: defaultMissionProgress.selectedChoice,
+        submitted: defaultMissionProgress.submitted,
+        answeredQuestionIds: defaultMissionProgress.answeredQuestionIds,
+        correctCount: defaultMissionProgress.correctCount,
+        flaggedQuestionIds: defaultMissionProgress.flaggedQuestionIds,
+        reviewQuestionIds: defaultMissionProgress.reviewQuestionIds
+      },
+      create: {
+        id: 1,
+        currentStepIndex: defaultMissionProgress.currentStepIndex,
+        questionIndex: defaultMissionProgress.questionIndex,
+        selectedChoice: defaultMissionProgress.selectedChoice,
+        submitted: defaultMissionProgress.submitted,
+        answeredQuestionIds: defaultMissionProgress.answeredQuestionIds,
+        correctCount: defaultMissionProgress.correctCount,
+        flaggedQuestionIds: defaultMissionProgress.flaggedQuestionIds,
+        reviewQuestionIds: defaultMissionProgress.reviewQuestionIds,
+        userProfileId: 1
+      }
+    });
+  });
+
+  return readAppStateFromDb();
+}

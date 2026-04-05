@@ -1,4 +1,4 @@
-import { allMissionQuestions } from "@/data/mock-data";
+import { seedQuestions } from "@/lib/content-seeds";
 import type { MissionAttemptRecord, PersistedReviewItem, RewardBadge, SkillMetric } from "@/lib/types";
 
 export function getReviewResolutionStats(items: PersistedReviewItem[]) {
@@ -17,7 +17,8 @@ export function getReviewResolutionStats(items: PersistedReviewItem[]) {
 
 export function getSkillMetricsFromReviewItems(
   items: PersistedReviewItem[],
-  attempts: MissionAttemptRecord[] = []
+  attempts: MissionAttemptRecord[] = [],
+  questions = seedQuestions
 ): SkillMetric[] {
   const backlogBySkill = new Map<string, number>();
   const resolvedBySkill = new Map<string, number>();
@@ -40,7 +41,7 @@ export function getSkillMetricsFromReviewItems(
 
   const catalog = Array.from(
     new Map(
-      allMissionQuestions.map((question) => [
+      questions.map((question) => [
         question.skill,
         {
           skill: question.skill,

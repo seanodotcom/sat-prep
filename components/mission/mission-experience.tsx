@@ -2,9 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getMissionDayConfig, missionSteps } from "@/data/mock-data";
 import { MissionPlayer } from "@/components/mission/mission-player";
 import { MissionSidebar } from "@/components/mission/mission-sidebar";
+import { hydrateMissionConfig } from "@/lib/content";
 import {
   persistMissionProgress,
   persistStudyProgress,
@@ -12,7 +12,7 @@ import {
   subscribeToAppStateSync,
   syncAppStateFromServer
 } from "@/lib/app-state-client";
-import { getCurrentDayProgress } from "@/lib/mission";
+import { getCurrentDayProgressFromPlan } from "@/lib/mission";
 import {
   defaultStudyProgress,
   defaultMissionProgress,
@@ -20,6 +20,7 @@ import {
   type StudyProgress
 } from "@/lib/storage";
 import type { MissionStep } from "@/lib/types";
+import { useStudyContent } from "@/lib/use-study-content";
 
 export function MissionExperience() {
   const router = useRouter();
@@ -28,6 +29,7 @@ export function MissionExperience() {
   const [hydrated, setHydrated] = useState(false);
   const hasSyncedInitialMissionRef = useRef(false);
   const hasSyncedInitialStudyRef = useRef(false);
+  const { questions, planDays } = useStudyContent();
 
   useEffect(() => {
     function syncFromClientState() {
@@ -82,10 +84,13 @@ export function MissionExperience() {
 
   const steps = useMemo<MissionStep[]>(
     () =>
-      getMissionDayConfig(studyProgress.currentDay, getCurrentDayProgress(studyProgress).currentPlan).steps.map((step, index) => ({
+      hydrateMissionConfig(
+        getCurrentDayProgressFromPlan(studyProgress, planDays).currentPlan,
+        questions
+      ).steps.map((step, index) => ({
         ...step,
         status:
-          progress.currentStepIndex >= missionSteps.length
+          progress.currentStepIndex >= 4
             ? "complete"
             : index < progress.currentStepIndex
               ? "complete"
@@ -93,13 +98,16 @@ export function MissionExperience() {
                 ? "active"
                 : "up-next"
       })),
-    [progress.currentStepIndex, studyProgress]
+    [planDays, progress.currentStepIndex, questions, studyProgress]
   );
 
-  const currentDayPlan = useMemo(() => getCurrentDayProgress(studyProgress), [studyProgress]);
+  const currentDayPlan = useMemo(
+    () => getCurrentDayProgressFromPlan(studyProgress, planDays),
+    [planDays, studyProgress]
+  );
   const missionConfig = useMemo(
-    () => getMissionDayConfig(currentDayPlan.currentDay, currentDayPlan.currentPlan),
-    [currentDayPlan]
+    () => hydrateMissionConfig(currentDayPlan.currentPlan, questions),
+    [currentDayPlan.currentPlan, questions]
   );
 
   const currentStep = steps[Math.min(progress.currentStepIndex, steps.length - 1)];
@@ -178,6 +186,7 @@ export function MissionExperience() {
         <MissionPlayer
           currentDay={currentDayPlan.currentDay}
           missionConfig={missionConfig}
+          questionCatalog={questions}
           progress={progress}
           questionSet={currentQuestionSet}
           steps={steps}

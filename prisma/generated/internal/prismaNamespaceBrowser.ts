@@ -53,7 +53,9 @@ export const ModelName = {
   StudyProgress: 'StudyProgress',
   MissionProgress: 'MissionProgress',
   ReviewItem: 'ReviewItem',
-  MissionAttempt: 'MissionAttempt'
+  MissionAttempt: 'MissionAttempt',
+  QuestionContent: 'QuestionContent',
+  PlanDayContent: 'PlanDayContent'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -149,6 +151,42 @@ export const MissionAttemptScalarFieldEnum = {
 } as const
 
 export type MissionAttemptScalarFieldEnum = (typeof MissionAttemptScalarFieldEnum)[keyof typeof MissionAttemptScalarFieldEnum]
+
+
+export const QuestionContentScalarFieldEnum = {
+  id: 'id',
+  section: 'section',
+  domain: 'domain',
+  skill: 'skill',
+  difficulty: 'difficulty',
+  prompt: 'prompt',
+  choices: 'choices',
+  answer: 'answer',
+  explanation: 'explanation',
+  estimatedTimeSec: 'estimatedTimeSec',
+  errorTags: 'errorTags',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userProfileId: 'userProfileId'
+} as const
+
+export type QuestionContentScalarFieldEnum = (typeof QuestionContentScalarFieldEnum)[keyof typeof QuestionContentScalarFieldEnum]
+
+
+export const PlanDayContentScalarFieldEnum = {
+  day: 'day',
+  title: 'title',
+  focus: 'focus',
+  missionType: 'missionType',
+  duration: 'duration',
+  rationale: 'rationale',
+  missionConfig: 'missionConfig',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userProfileId: 'userProfileId'
+} as const
+
+export type PlanDayContentScalarFieldEnum = (typeof PlanDayContentScalarFieldEnum)[keyof typeof PlanDayContentScalarFieldEnum]
 
 
 export const SortOrder = {

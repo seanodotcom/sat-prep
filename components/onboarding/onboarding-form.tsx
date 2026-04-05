@@ -105,19 +105,19 @@ export function OnboardingForm() {
             options={["Math", "Reading & Writing"]}
           />
           <div className="rounded-[22px] border border-sky-500/20 bg-gradient-to-br from-sky-500/10 to-slate-950 p-5 text-sm text-slate-200">
-            <p className="font-semibold text-white">Starter plan preview</p>
+            <p className="font-semibold text-white">Plan preview</p>
             <p className="mt-2">
               {preferences.firstName || "You"} will start with a {preferences.targetScore} target, {preferences.preferredDailyMinutes}-minute study blocks, and {preferences.focusSection} as the first emphasis area.
             </p>
           </div>
           <div className="rounded-[22px] border border-slate-800 bg-slate-950 p-5 text-sm text-slate-200">
-            <p className="font-semibold text-white">Future-ready note</p>
+            <p className="font-semibold text-white">Why this stays simple</p>
             <p className="mt-2">
-              Keep this form intentionally small. The schema should still support later additions like diagnostic score bands, confidence ratings, and school schedule constraints.
+              This setup stays intentionally lightweight so you can get into the plan quickly while still leaving room for richer personalization later.
             </p>
           </div>
           <div className="flex gap-3">
-            <Button type="submit">{returningStudent ? "Save changes" : "Create my starter plan"}</Button>
+            <Button type="submit">{returningStudent ? "Save changes" : "Create my plan"}</Button>
             {returningStudent ? <Button href="/app" variant="secondary">Back to dashboard</Button> : null}
             <Button href="/" variant="secondary">
               Welcome

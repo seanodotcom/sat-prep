@@ -1,6 +1,6 @@
-# Summit SAT v1 Starter
+# Summit SAT
 
-Builder-ready starter scaffold for a modern SAT prep web app focused on:
+Summit SAT is a modern SAT prep web app focused on:
 
 - daily missions
 - drills and timed mini-tests
@@ -22,25 +22,18 @@ Builder-ready starter scaffold for a modern SAT prep web app focused on:
 
 - `app/` Next.js App Router routes
 - `components/` route-level UI building blocks
-- `data/mock-data.ts` typed mock content for v1
-- `lib/types.ts` core UI and domain types
+- `data/mock-data.ts` question bank and app content
+- `lib/` shared domain logic, client sync helpers, and insight utilities
+- `prisma/` database schema and generated client
 
 ## Local run
 
 1. `npm install`
 2. `npm run dev`
 
-## Next build steps
-
-- wire UI to auth and persistence
-- replace mock data with Prisma-backed queries
-- add mission session state and timers
-- store attempts, answers, and mistake-log events
-- implement adaptive mission generation service
-
 ## Prisma setup
 
-For production-friendly persistence on Vercel, this repo is scaffolded for Prisma with hosted Postgres.
+For production-friendly persistence on Vercel, this repo uses Prisma with hosted Postgres.
 
 1. Create a Prisma Postgres database from the Vercel Marketplace and connect it to the project.
 2. Copy `.env.example` to `.env.local` and confirm `DATABASE_URL` is set.
@@ -52,6 +45,10 @@ If `prisma migrate dev` gives you trouble on the hosted database during early pr
 
 - `npm run db:push`
 
-Current schema files:
+Current persistence covers:
 
-- `prisma/schema.prisma`
+- onboarding profile
+- study progress
+- mission progress
+- review items
+- mission attempts
