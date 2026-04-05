@@ -186,7 +186,7 @@ export function AppShell({
             }}
           >
             <aside
-              className="panel absolute left-4 top-4 w-[280px] rounded-[28px] p-5"
+              className="panel absolute left-4 top-4 max-h-[calc(100vh-2rem)] w-[280px] overflow-y-auto rounded-[28px] p-5"
               onClick={(event) => event.stopPropagation()}
             >
               <div className="mb-8 flex items-start justify-between gap-3">
