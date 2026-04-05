@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { HomePageCta } from "@/components/landing/home-page-cta";
 
 export default function HomePage() {
   return (
@@ -12,9 +12,7 @@ export default function HomePage() {
           Start by adding your personal info. Once that's set, the app will take you straight
           into your day-by-day mission flow.
         </p>
-        <div className="mt-8">
-          <Button href="/onboarding">Set up personal info</Button>
-        </div>
+        <HomePageCta />
       </section>
     </main>
   );

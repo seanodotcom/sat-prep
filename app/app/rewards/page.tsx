@@ -1,6 +1,7 @@
 import { AppShell } from "@/components/layout/app-shell";
 import { RewardsGrid } from "@/components/rewards/rewards-grid";
 import { dayPlan } from "@/data/mock-data";
+import { RewardsSummary } from "@/components/rewards/rewards-summary";
 
 export default function RewardsPage() {
   return (
@@ -25,6 +26,7 @@ export default function RewardsPage() {
           </div>
         </div>
       </section>
+      <RewardsSummary />
       <RewardsGrid />
     </AppShell>
   );

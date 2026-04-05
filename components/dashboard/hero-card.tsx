@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { dashboardStats } from "@/data/mock-data";
+import { readClientAppState, subscribeToAppStateSync, syncAppStateFromServer } from "@/lib/app-state-client";
+import {
+  loadMissionAttempts,
+  subscribeToMissionAttemptsSync,
+  syncMissionAttemptsFromServer
+} from "@/lib/mission-attempts-client";
+import { getCurrentStreak, getQuestionsSolved } from "@/lib/dashboard-insights";
 import { ProgressBar } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,57 +20,60 @@ import {
   defaultOnboardingPreferences,
   defaultMissionProgress,
   defaultStudyProgress,
-  MISSION_PROGRESS_KEY,
-  ONBOARDING_PREFERENCES_KEY,
-  STUDY_PROGRESS_KEY,
   type OnboardingPreferences,
   type StoredMissionProgress,
   type StudyProgress
 } from "@/lib/storage";
+import type { MissionAttemptRecord } from "@/lib/types";
 
 export function HeroCard() {
   const [progress, setProgress] = useState<StoredMissionProgress>(defaultMissionProgress);
   const [preferences, setPreferences] = useState<OnboardingPreferences>(defaultOnboardingPreferences);
   const [studyProgress, setStudyProgress] = useState<StudyProgress>(defaultStudyProgress);
+  const [attempts, setAttempts] = useState<MissionAttemptRecord[]>([]);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
+    function syncFromClientState() {
+      const state = readClientAppState();
+      setProgress(state.missionProgress);
+      setPreferences(state.onboardingPreferences);
+      setStudyProgress(state.studyProgress);
+      setAttempts(loadMissionAttempts());
+    }
+
     try {
-      const storedMission = window.localStorage.getItem(MISSION_PROGRESS_KEY);
-      if (storedMission) {
-        setProgress({
-          ...defaultMissionProgress,
-          ...JSON.parse(storedMission)
-        });
-      }
-
-      const storedPreferences = window.localStorage.getItem(ONBOARDING_PREFERENCES_KEY);
-      if (storedPreferences) {
-        setPreferences({
-          ...defaultOnboardingPreferences,
-          ...JSON.parse(storedPreferences)
-        });
-      }
-
-      const storedStudyProgress = window.localStorage.getItem(STUDY_PROGRESS_KEY);
-      if (storedStudyProgress) {
-        setStudyProgress({
-          ...defaultStudyProgress,
-          ...JSON.parse(storedStudyProgress)
-        });
-      }
+      syncFromClientState();
+      void syncAppStateFromServer().then((state) => {
+        setProgress(state.missionProgress);
+        setPreferences(state.onboardingPreferences);
+        setStudyProgress(state.studyProgress);
+      });
+      void syncMissionAttemptsFromServer().then(setAttempts);
     } catch {
-      window.localStorage.removeItem(MISSION_PROGRESS_KEY);
-      window.localStorage.removeItem(ONBOARDING_PREFERENCES_KEY);
-      window.localStorage.removeItem(STUDY_PROGRESS_KEY);
+      setProgress(defaultMissionProgress);
+      setPreferences(defaultOnboardingPreferences);
+      setStudyProgress(defaultStudyProgress);
     } finally {
       setHydrated(true);
     }
+
+    const unsubscribeAppState = subscribeToAppStateSync(syncFromClientState);
+    const unsubscribeAttempts = subscribeToMissionAttemptsSync(() => {
+      setAttempts(loadMissionAttempts());
+    });
+
+    return () => {
+      unsubscribeAppState();
+      unsubscribeAttempts();
+    };
   }, []);
 
   const snapshot = useMemo(() => getMissionSnapshot(progress), [progress]);
   const dayProgress = useMemo(() => getCurrentDayProgress(studyProgress), [studyProgress]);
   const upcomingDay = useMemo(() => getUpcomingDayPreview(studyProgress), [studyProgress]);
+  const streakDays = useMemo(() => getCurrentStreak(studyProgress), [studyProgress]);
+  const questionsSolved = useMemo(() => getQuestionsSolved(attempts), [attempts]);
   const missionComplete = snapshot.completedSteps >= snapshot.totalSteps;
   const dayRationale = useMemo(() => getDayRationale(dayProgress.currentDay), [dayProgress.currentDay]);
   const completedDayLabel = missionComplete
@@ -189,8 +198,8 @@ export function HeroCard() {
           <div className="grid grid-cols-2 gap-4">
             <StatCard label="Target" value={preferences.targetScore.toString()} />
             <StatCard label="Daily mins" value={`${preferences.preferredDailyMinutes}`} />
-            <StatCard label="Streak" value={`${dashboardStats.streakDays} days`} />
-            <StatCard label="Test date" value={targetTestDateLabel} />
+            <StatCard label="Streak" value={`${streakDays} days`} />
+            <StatCard label="Solved" value={`${questionsSolved}`} />
           </div>
         </div>
       </div>
@@ -203,7 +212,7 @@ function StatCard({ label, value }: { label: string; value: string }) {
     Target: "border-teal-500/25 bg-gradient-to-br from-teal-500/12 to-slate-950",
     "Daily mins": "border-sky-500/25 bg-gradient-to-br from-sky-500/12 to-slate-950",
     Streak: "border-coral/25 bg-gradient-to-br from-coral/12 to-slate-950",
-    "Test date": "border-amber-500/25 bg-gradient-to-br from-amber-500/12 to-slate-950"
+    Solved: "border-amber-500/25 bg-gradient-to-br from-amber-500/12 to-slate-950"
   };
 
   return (

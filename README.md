@@ -37,3 +37,21 @@ Builder-ready starter scaffold for a modern SAT prep web app focused on:
 - add mission session state and timers
 - store attempts, answers, and mistake-log events
 - implement adaptive mission generation service
+
+## Prisma setup
+
+For production-friendly persistence on Vercel, this repo is scaffolded for Prisma with hosted Postgres.
+
+1. Create a Prisma Postgres database from the Vercel Marketplace and connect it to the project.
+2. Copy `.env.example` to `.env.local` and confirm `DATABASE_URL` is set.
+3. Install dependencies with `npm install`.
+4. Generate the client with `npm run db:generate`.
+5. Create and apply the first migration with `npm run db:migrate`.
+
+If `prisma migrate dev` gives you trouble on the hosted database during early prototyping, you can use:
+
+- `npm run db:push`
+
+Current schema files:
+
+- `prisma/schema.prisma`

@@ -5,20 +5,35 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { Route } from "next";
 import { appNav } from "@/data/mock-data";
+import {
+  readClientAppState,
+  subscribeToAppStateSync,
+  syncAppStateFromServer
+} from "@/lib/app-state-client";
+import {
+  loadMissionAttempts,
+  subscribeToMissionAttemptsSync,
+  syncMissionAttemptsFromServer
+} from "@/lib/mission-attempts-client";
 import { Button } from "@/components/ui/button";
 import { Chip } from "@/components/ui/chip";
 import { cn } from "@/lib/utils";
+import { getCurrentStreak, getQuestionsSolved } from "@/lib/dashboard-insights";
 import { getCurrentDayProgress, getMissionSnapshot } from "@/lib/mission";
 import {
-  APP_STORAGE_KEYS,
+  defaultOnboardingPreferences,
   defaultStudyProgress,
   defaultMissionProgress,
-  MISSION_PROGRESS_KEY,
-  ONBOARDING_PREFERENCES_KEY,
-  STUDY_PROGRESS_KEY,
+  clearAppStorage,
+  loadMissionProgress,
+  loadOnboardingPreferences,
+  loadStudyProgress,
+  hasCompletedOnboarding,
+  type OnboardingPreferences,
   type StoredMissionProgress,
   type StudyProgress
 } from "@/lib/storage";
+import type { MissionAttemptRecord } from "@/lib/types";
 
 export function AppShell({
   children,
@@ -29,45 +44,91 @@ export function AppShell({
 }) {
   const router = useRouter();
   const [progress, setProgress] = useState<StoredMissionProgress>(defaultMissionProgress);
+  const [preferences, setPreferences] = useState<OnboardingPreferences>(defaultOnboardingPreferences);
   const [studyProgress, setStudyProgress] = useState<StudyProgress>(defaultStudyProgress);
+  const [attempts, setAttempts] = useState<MissionAttemptRecord[]>([]);
   const [menuOpen, setMenuOpen] = useState(false);
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    try {
-      const stored = window.localStorage.getItem(MISSION_PROGRESS_KEY);
-      if (stored) {
-        setProgress({
-          ...defaultMissionProgress,
-          ...JSON.parse(stored)
-        });
-      }
-
-      const storedStudyProgress = window.localStorage.getItem(STUDY_PROGRESS_KEY);
-      if (storedStudyProgress) {
-        setStudyProgress({
-          ...defaultStudyProgress,
-          ...JSON.parse(storedStudyProgress)
-        });
-      }
-    } catch {
-      window.localStorage.removeItem(MISSION_PROGRESS_KEY);
-      window.localStorage.removeItem(ONBOARDING_PREFERENCES_KEY);
-      window.localStorage.removeItem(STUDY_PROGRESS_KEY);
+    function syncFromClientState() {
+      const state = readClientAppState();
+      setProgress(state.missionProgress);
+      setPreferences(state.onboardingPreferences);
+      setStudyProgress(state.studyProgress);
+      setAttempts(loadMissionAttempts());
     }
+
+    try {
+      syncFromClientState();
+      void syncAppStateFromServer().then((state) => {
+        setProgress(state.missionProgress);
+        setPreferences(state.onboardingPreferences);
+        setStudyProgress(state.studyProgress);
+      });
+      void syncMissionAttemptsFromServer().then(setAttempts);
+    } catch {
+      setProgress(defaultMissionProgress);
+      setPreferences(defaultOnboardingPreferences);
+      setStudyProgress(defaultStudyProgress);
+    } finally {
+      setHydrated(true);
+    }
+
+    const unsubscribeAppState = subscribeToAppStateSync(syncFromClientState);
+    const unsubscribeAttempts = subscribeToMissionAttemptsSync(() => {
+      setAttempts(loadMissionAttempts());
+    });
+
+    return () => {
+      unsubscribeAppState();
+      unsubscribeAttempts();
+    };
   }, []);
+
+  useEffect(() => {
+    if (!hydrated || hasCompletedOnboarding(preferences)) return;
+    router.replace("/onboarding");
+  }, [hydrated, preferences, router]);
 
   const snapshot = useMemo(() => getMissionSnapshot(progress), [progress]);
   const dayProgress = useMemo(() => getCurrentDayProgress(studyProgress), [studyProgress]);
+  const streakDays = useMemo(() => getCurrentStreak(studyProgress), [studyProgress]);
+  const questionsSolved = useMemo(() => getQuestionsSolved(attempts), [attempts]);
+  const onboardingComplete = hasCompletedOnboarding(preferences);
 
   function confirmFullReset() {
-    APP_STORAGE_KEYS.forEach((key) => window.localStorage.removeItem(key));
+    clearAppStorage();
     setProgress(defaultMissionProgress);
+    setPreferences(defaultOnboardingPreferences);
     setStudyProgress(defaultStudyProgress);
     setResetConfirmOpen(false);
     setMenuOpen(false);
     router.push("/");
     router.refresh();
+  }
+
+  if (!hydrated || !onboardingComplete) {
+    return (
+      <div className="min-h-screen">
+        <div className="mx-auto flex max-w-5xl px-6 py-10 lg:px-8">
+          <section className="panel w-full rounded-[32px] p-8">
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-teal-300">
+              Setup required
+            </p>
+            <h1 className="mt-4 text-3xl font-bold text-slate-100">
+              Finishing onboarding keeps the mission personalized and saved on this device.
+            </h1>
+            <p className="mt-4 max-w-2xl text-slate-400">
+              {hydrated
+                ? "Redirecting you to the setup screen now."
+                : "Loading your saved profile and study state."}
+            </p>
+          </section>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -198,7 +259,9 @@ export function AppShell({
                   </span>
                 </button>
                 <div>
-                  <p className="text-sm text-slate-400">30-day mission</p>
+                  <p className="text-sm text-slate-400">
+                    {preferences.firstName ? `Welcome back, ${preferences.firstName}` : "30-day mission"}
+                  </p>
                   <p className="text-xl font-bold text-slate-100">
                     Day {dayProgress.currentDay} of {dayProgress.totalDays}
                   </p>
@@ -227,7 +290,9 @@ export function AppShell({
               </div>
             </div>
             <div className="flex items-center gap-3 lg:justify-self-end">
-              <Chip tone="success">8-day streak</Chip>
+              <Chip>{preferences.targetScore} target</Chip>
+              <Chip tone="success">{streakDays} day streak</Chip>
+              <Chip>{questionsSolved} solved</Chip>
               <Button href="/app/mission">{snapshot.primaryLabel}</Button>
             </div>
           </div>

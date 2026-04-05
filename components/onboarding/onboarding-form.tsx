@@ -1,17 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { syncAppStateFromServer, persistOnboardingPreferences } from "@/lib/app-state-client";
 import {
   defaultOnboardingPreferences,
-  ONBOARDING_PREFERENCES_KEY,
+  hasCompletedOnboarding,
+  loadOnboardingPreferences,
   type OnboardingPreferences
 } from "@/lib/storage";
 
 export function OnboardingForm() {
   const router = useRouter();
   const [preferences, setPreferences] = useState<OnboardingPreferences>(defaultOnboardingPreferences);
+  const [hydrated, setHydrated] = useState(false);
+  const returningStudent = hydrated && hasCompletedOnboarding(preferences);
+
+  useEffect(() => {
+    try {
+      setPreferences(loadOnboardingPreferences());
+      void syncAppStateFromServer().then((state) => {
+        setPreferences(state.onboardingPreferences);
+      });
+    } finally {
+      setHydrated(true);
+    }
+  }, []);
 
   function updatePreference<K extends keyof OnboardingPreferences>(
     key: K,
@@ -23,9 +38,9 @@ export function OnboardingForm() {
     }));
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    window.localStorage.setItem(ONBOARDING_PREFERENCES_KEY, JSON.stringify(preferences));
+    await persistOnboardingPreferences(preferences);
     router.push("/app");
   }
 
@@ -34,12 +49,24 @@ export function OnboardingForm() {
       <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.24em] text-teal-300">Personal info</p>
-          <h1 className="mt-3 text-4xl font-bold text-slate-100">Tell the app who it's planning for.</h1>
+          <h1 className="mt-3 text-4xl font-bold text-slate-100">
+            {returningStudent ? "Update your saved plan settings." : "Tell the app who it's planning for."}
+          </h1>
           <p className="mt-4 text-slate-400">
-            Start with your name and a few planning defaults. Once this is saved, the app can drop you directly into the 30-day mission.
+            {returningStudent
+              ? "These values are already saved on this device. Change them here any time and the rest of the app will pick them up."
+              : "Start with your name and a few planning defaults. Once this is saved, the app can drop you directly into the 30-day mission."}
           </p>
         </div>
         <div className="grid gap-4">
+          {returningStudent ? (
+            <div className="rounded-[22px] border border-teal-400/20 bg-gradient-to-br from-teal-500/10 to-slate-950 p-5 text-sm text-slate-200">
+              <p className="font-semibold text-white">Saved profile found</p>
+              <p className="mt-2">
+                {preferences.firstName}, your current plan is already active. You can update it here or jump straight back into the dashboard.
+              </p>
+            </div>
+          ) : null}
           <Field
             label="First name"
             value={preferences.firstName}
@@ -90,7 +117,8 @@ export function OnboardingForm() {
             </p>
           </div>
           <div className="flex gap-3">
-            <Button type="submit">Create my starter plan</Button>
+            <Button type="submit">{returningStudent ? "Save changes" : "Create my starter plan"}</Button>
+            {returningStudent ? <Button href="/app" variant="secondary">Back to dashboard</Button> : null}
             <Button href="/" variant="secondary">
               Welcome
             </Button>

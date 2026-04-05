@@ -1,16 +1,21 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getMissionDayConfig, missionSteps } from "@/data/mock-data";
 import { MissionPlayer } from "@/components/mission/mission-player";
 import { MissionSidebar } from "@/components/mission/mission-sidebar";
+import {
+  persistMissionProgress,
+  persistStudyProgress,
+  readClientAppState,
+  subscribeToAppStateSync,
+  syncAppStateFromServer
+} from "@/lib/app-state-client";
 import { getCurrentDayProgress } from "@/lib/mission";
 import {
   defaultStudyProgress,
   defaultMissionProgress,
-  MISSION_PROGRESS_KEY,
-  STUDY_PROGRESS_KEY,
   type StoredMissionProgress,
   type StudyProgress
 } from "@/lib/storage";
@@ -21,40 +26,48 @@ export function MissionExperience() {
   const [progress, setProgress] = useState<StoredMissionProgress>(defaultMissionProgress);
   const [studyProgress, setStudyProgress] = useState<StudyProgress>(defaultStudyProgress);
   const [hydrated, setHydrated] = useState(false);
+  const hasSyncedInitialMissionRef = useRef(false);
+  const hasSyncedInitialStudyRef = useRef(false);
 
   useEffect(() => {
-    try {
-      const stored = window.localStorage.getItem(MISSION_PROGRESS_KEY);
-      if (stored) {
-        setProgress({
-          ...defaultMissionProgress,
-          ...JSON.parse(stored)
-        });
-      }
+    function syncFromClientState() {
+      const state = readClientAppState();
+      setProgress(state.missionProgress);
+      setStudyProgress(state.studyProgress);
+    }
 
-      const storedStudyProgress = window.localStorage.getItem(STUDY_PROGRESS_KEY);
-      if (storedStudyProgress) {
-        setStudyProgress({
-          ...defaultStudyProgress,
-          ...JSON.parse(storedStudyProgress)
-        });
-      }
+    try {
+      syncFromClientState();
+      void syncAppStateFromServer().then((state) => {
+        setProgress(state.missionProgress);
+        setStudyProgress(state.studyProgress);
+      });
     } catch {
-      window.localStorage.removeItem(MISSION_PROGRESS_KEY);
-      window.localStorage.removeItem(STUDY_PROGRESS_KEY);
+      setProgress(defaultMissionProgress);
+      setStudyProgress(defaultStudyProgress);
     } finally {
       setHydrated(true);
     }
+
+    return subscribeToAppStateSync(syncFromClientState);
   }, []);
 
   useEffect(() => {
     if (!hydrated) return;
-    window.localStorage.setItem(MISSION_PROGRESS_KEY, JSON.stringify(progress));
+    if (!hasSyncedInitialMissionRef.current) {
+      hasSyncedInitialMissionRef.current = true;
+      return;
+    }
+    void persistMissionProgress(progress);
   }, [hydrated, progress]);
 
   useEffect(() => {
     if (!hydrated) return;
-    window.localStorage.setItem(STUDY_PROGRESS_KEY, JSON.stringify(studyProgress));
+    if (!hasSyncedInitialStudyRef.current) {
+      hasSyncedInitialStudyRef.current = true;
+      return;
+    }
+    void persistStudyProgress(studyProgress);
   }, [hydrated, studyProgress]);
 
   useEffect(() => {
@@ -63,6 +76,7 @@ export function MissionExperience() {
     if (params.get("fresh") !== "1") return;
 
     setProgress(defaultMissionProgress);
+    void persistMissionProgress(defaultMissionProgress);
     router.replace("/app/mission");
   }, [hydrated, router]);
 

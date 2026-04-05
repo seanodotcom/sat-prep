@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client"
+  output   = "./generated"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum FocusSection {
+  MATH
+  READING_WRITING
+}
+
+model UserProfile {
+  id                    Int           @id @default(1)
+  firstName             String        @default("")
+  targetScore           Int           @default(1400)
+  targetTestDate        DateTime?
+  preferredDailyMinutes Int           @default(20)
+  focusSection          FocusSection  @default(MATH)
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  studyProgress         StudyProgress?
+  missionProgress       MissionProgress?
+  reviewItems           ReviewItem[]
+  missionAttempts       MissionAttempt[]
+}
+
+model StudyProgress {
+  id            Int         @id @default(1)
+  currentDay    Int         @default(1)
+  completedDays Json        @default("[]")
+  updatedAt     DateTime    @updatedAt
+  userProfileId Int         @unique @default(1)
+  userProfile   UserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+}
+
+model MissionProgress {
+  id                Int         @id @default(1)
+  currentStepIndex  Int         @default(0)
+  questionIndex     Int         @default(0)
+  selectedChoice    String?
+  submitted         Boolean     @default(false)
+  answeredQuestionIds Json      @default("[]")
+  correctCount      Int         @default(0)
+  flaggedQuestionIds Json       @default("[]")
+  reviewQuestionIds Json        @default("[]")
+  updatedAt         DateTime    @updatedAt
+  userProfileId     Int         @unique @default(1)
+  userProfile       UserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+}
+
+model ReviewItem {
+  id            String     @id
+  questionId    String?
+  prompt        String
+  skill         String
+  errorType     String
+  lastSeen      String
+  section       String
+  retryReady    Boolean    @default(true)
+  source        String
+  status        String
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  userProfileId Int        @default(1)
+  userProfile   UserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+
+  @@index([userProfileId, status])
+}
+
+model MissionAttempt {
+  id             String      @id
+  questionId     String
+  day            Int
+  stepId         String
+  section        String
+  skill          String
+  selectedChoice String
+  isCorrect      Boolean
+  elapsedSec     Int         @default(0)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  userProfileId  Int         @default(1)
+  userProfile    UserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+
+  @@index([userProfileId, day])
+  @@index([userProfileId, questionId])
+}

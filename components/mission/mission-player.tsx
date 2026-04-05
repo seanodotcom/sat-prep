@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { allMissionQuestions } from "@/data/mock-data";
+import { upsertMissionAttempt } from "@/lib/mission-attempts-client";
+import { upsertReviewItem } from "@/lib/review-items-client";
 import { Chip } from "@/components/ui/chip";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -81,13 +83,15 @@ export function MissionPlayer({
   function handleSubmit() {
     if (!progress.selectedChoice) return;
 
+    const activeQuestion = questions[progress.questionIndex];
+    const gotCorrect = progress.selectedChoice === activeQuestion.answer;
+    const attemptId = `day-${currentDay}-${currentStep.id}-${activeQuestion.id}`;
+
     setProgress((current) => {
-      const activeQuestion = questions[current.questionIndex];
       const questionId = activeQuestion.id;
       const answeredQuestionIds = current.answeredQuestionIds.includes(questionId)
         ? current.answeredQuestionIds
         : [...current.answeredQuestionIds, questionId];
-      const gotCorrect = current.selectedChoice === activeQuestion.answer;
 
       return {
         ...current,
@@ -103,6 +107,33 @@ export function MissionPlayer({
             : current.reviewQuestionIds
       };
     });
+
+    void upsertMissionAttempt({
+      id: attemptId,
+      questionId: activeQuestion.id,
+      day: currentDay,
+      stepId: currentStep.id,
+      section: activeQuestion.section,
+      skill: activeQuestion.skill,
+      selectedChoice: progress.selectedChoice,
+      isCorrect: gotCorrect,
+      elapsedSec
+    });
+
+    if (!gotCorrect) {
+      void upsertReviewItem({
+        id: `review-${activeQuestion.id}`,
+        questionId: activeQuestion.id,
+        prompt: activeQuestion.prompt,
+        skill: activeQuestion.skill,
+        errorType: activeQuestion.errorTags[0] ?? "Concept Gap",
+        lastSeen: "Today",
+        section: activeQuestion.section,
+        retryReady: true,
+        source: "missed",
+        status: "ready"
+      });
+    }
   }
 
   function handleNext() {
@@ -126,15 +157,45 @@ export function MissionPlayer({
         ? current.reviewQuestionIds
         : [...current.reviewQuestionIds, question.id]
     }));
+
+    void upsertReviewItem({
+      id: `review-${question.id}`,
+      questionId: question.id,
+      prompt: question.prompt,
+      skill: question.skill,
+      errorType: question.errorTags[0] ?? "Needs Review",
+      lastSeen: "Today",
+      section: question.section,
+      retryReady: true,
+      source: "missed",
+      status: "ready"
+    });
   }
 
   function handleFlag() {
+    const nextFlagged = progress.flaggedQuestionIds.includes(question.id);
+
     setProgress((current) => ({
       ...current,
       flaggedQuestionIds: current.flaggedQuestionIds.includes(question.id)
         ? current.flaggedQuestionIds.filter((id) => id !== question.id)
         : [...current.flaggedQuestionIds, question.id]
     }));
+
+    if (!nextFlagged) {
+      void upsertReviewItem({
+        id: `flag-${question.id}`,
+        questionId: question.id,
+        prompt: question.prompt,
+        skill: question.skill,
+        errorType: question.errorTags[0] ?? "Flagged for review",
+        lastSeen: "Today",
+        section: question.section,
+        retryReady: false,
+        source: "flagged",
+        status: "new"
+      });
+    }
   }
 
   if (currentStep.id === "brief") {

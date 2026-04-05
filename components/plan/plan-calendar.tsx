@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { readClientAppState, subscribeToAppStateSync, syncAppStateFromServer } from "@/lib/app-state-client";
 import { dayPlan, getMissionDayConfig } from "@/data/mock-data";
 import { Button } from "@/components/ui/button";
 import { Chip } from "@/components/ui/chip";
@@ -8,7 +9,7 @@ import { ProgressBar } from "@/components/ui/progress";
 import { getCurrentDayProgress, getDayRationale, getUpcomingDayPreview } from "@/lib/mission";
 import {
   defaultStudyProgress,
-  STUDY_PROGRESS_KEY,
+  loadStudyProgress,
   type StudyProgress
 } from "@/lib/storage";
 import { cn } from "@/lib/utils";
@@ -18,17 +19,20 @@ export function PlanCalendar() {
   const [selectedDay, setSelectedDay] = useState<number>(defaultStudyProgress.currentDay);
 
   useEffect(() => {
-    try {
-      const storedStudyProgress = window.localStorage.getItem(STUDY_PROGRESS_KEY);
-      if (storedStudyProgress) {
-        setStudyProgress({
-          ...defaultStudyProgress,
-          ...JSON.parse(storedStudyProgress)
-        });
-      }
-    } catch {
-      window.localStorage.removeItem(STUDY_PROGRESS_KEY);
+    function syncFromClientState() {
+      setStudyProgress(readClientAppState().studyProgress);
     }
+
+    try {
+      syncFromClientState();
+      void syncAppStateFromServer().then((state) => {
+        setStudyProgress(state.studyProgress);
+      });
+    } catch {
+      setStudyProgress(defaultStudyProgress);
+    }
+
+    return subscribeToAppStateSync(syncFromClientState);
   }, []);
 
   const dayProgress = useMemo(() => getCurrentDayProgress(studyProgress), [studyProgress]);

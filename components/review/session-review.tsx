@@ -1,15 +1,33 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { allMissionQuestions, reviewQueue } from "@/data/mock-data";
+import { allMissionQuestions } from "@/data/mock-data";
+import {
+  clearSessionReviewItems,
+  deleteReviewItem,
+  loadReviewItems,
+  resolveReviewItem,
+  subscribeToReviewItemsSync,
+  syncReviewItemsFromServer
+} from "@/lib/review-items-client";
+import {
+  persistMissionProgress,
+  readClientAppState,
+  subscribeToAppStateSync,
+  syncAppStateFromServer
+} from "@/lib/app-state-client";
 import { Button } from "@/components/ui/button";
 import { Chip } from "@/components/ui/chip";
-import { defaultMissionProgress, MISSION_PROGRESS_KEY, type StoredMissionProgress } from "@/lib/storage";
+import {
+  defaultMissionProgress,
+  type StoredMissionProgress
+} from "@/lib/storage";
 import { getMissionSnapshot } from "@/lib/mission";
-import type { SessionReviewItem } from "@/lib/types";
+import type { PersistedReviewItem, SessionReviewItem } from "@/lib/types";
 
 export function SessionReview() {
   const [progress, setProgress] = useState<StoredMissionProgress>(defaultMissionProgress);
+  const [reviewItems, setReviewItems] = useState<PersistedReviewItem[]>([]);
   const [hydrated, setHydrated] = useState(false);
   const [activeRetryId, setActiveRetryId] = useState<string | null>(null);
   const [retryChoice, setRetryChoice] = useState<string | null>(null);
@@ -17,45 +35,54 @@ export function SessionReview() {
   const retryPanelRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    function syncFromClientState() {
+      setProgress(readClientAppState().missionProgress);
+    }
+
     try {
-      const stored = window.localStorage.getItem(MISSION_PROGRESS_KEY);
-      if (stored) {
-        setProgress({
-          ...defaultMissionProgress,
-          ...JSON.parse(stored)
-        });
-      }
+      syncFromClientState();
+      void syncAppStateFromServer().then((state) => {
+        setProgress(state.missionProgress);
+      });
+      setReviewItems(loadReviewItems());
+      void syncReviewItemsFromServer().then(setReviewItems);
     } catch {
-      window.localStorage.removeItem(MISSION_PROGRESS_KEY);
+      setProgress(defaultMissionProgress);
     } finally {
       setHydrated(true);
     }
+
+    const unsubscribeAppState = subscribeToAppStateSync(syncFromClientState);
+    const unsubscribeReviewItems = subscribeToReviewItemsSync(() => {
+      setReviewItems(loadReviewItems());
+    });
+
+    return () => {
+      unsubscribeAppState();
+      unsubscribeReviewItems();
+    };
   }, []);
 
   const sessionItems = useMemo<SessionReviewItem[]>(() => {
-    const reviewIds = new Set(progress.reviewQuestionIds);
-    const flaggedIds = new Set(progress.flaggedQuestionIds);
+    return reviewItems
+      .filter((item) => item.source === "missed" || item.source === "flagged")
+      .filter((item) => item.status !== "resolved")
+      .map((item) => ({
+        id: item.id,
+        questionId: item.questionId,
+        prompt: item.prompt,
+        skill: item.skill,
+        section: item.section,
+        source: item.source === "flagged" ? "flagged" : "missed",
+        status: item.status === "ready" ? "ready" : "new"
+      }));
+  }, [reviewItems]);
 
-    return allMissionQuestions.flatMap((question) => {
-      const inReview = reviewIds.has(question.id);
-      const flagged = flaggedIds.has(question.id);
-
-      if (!inReview && !flagged) {
-        return [];
-      }
-
-      return [
-        {
-          id: question.id,
-          prompt: question.prompt,
-          skill: question.skill,
-          section: question.section,
-          source: inReview ? "missed" : "flagged",
-          status: inReview ? "ready" : "new"
-        }
-      ];
-    });
-  }, [progress.flaggedQuestionIds, progress.reviewQuestionIds]);
+  const seedItems = useMemo(
+    () =>
+      reviewItems.filter((item) => item.source === "seed" && item.status !== "resolved"),
+    [reviewItems]
+  );
 
   const snapshot = useMemo(() => getMissionSnapshot(progress), [progress]);
   const missionIsComplete = snapshot.completedSteps >= snapshot.totalSteps;
@@ -72,6 +99,9 @@ export function SessionReview() {
   const activeRetryQuestion = activeRetryId
     ? allMissionQuestions.find((question) => question.id === activeRetryId) ?? null
     : null;
+  const activeReviewItem = activeRetryId
+    ? reviewItems.find((item) => item.questionId === activeRetryId && item.status !== "resolved") ?? null
+    : null;
   const retryCorrect = retrySubmitted && retryChoice === activeRetryQuestion?.answer;
 
   function clearSessionQueue() {
@@ -82,7 +112,8 @@ export function SessionReview() {
     };
 
     setProgress(nextProgress);
-    window.localStorage.setItem(MISSION_PROGRESS_KEY, JSON.stringify(nextProgress));
+    void persistMissionProgress(nextProgress);
+    void clearSessionReviewItems();
   }
 
   function startRetry(questionId: string) {
@@ -110,7 +141,13 @@ export function SessionReview() {
     };
 
     setProgress(nextProgress);
-    window.localStorage.setItem(MISSION_PROGRESS_KEY, JSON.stringify(nextProgress));
+    void persistMissionProgress(nextProgress);
+    if (activeReviewItem) {
+      void resolveReviewItem(activeReviewItem);
+    } else {
+      void deleteReviewItem(`review-${questionId}`);
+      void deleteReviewItem(`flag-${questionId}`);
+    }
     closeRetry();
   }
 
@@ -176,7 +213,10 @@ export function SessionReview() {
                   Status: {item.status === "ready" ? "Ready to retry now" : "Saved for later review"}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-3">
-                  <Button variant="secondary" onClick={() => startRetry(item.id)}>
+                  <Button
+                    variant="secondary"
+                    onClick={() => startRetry(item.questionId ?? item.id)}
+                  >
                     {item.source === "missed" ? "Retry now" : "Open review"}
                   </Button>
                 </div>
@@ -193,10 +233,10 @@ export function SessionReview() {
       <div className="panel rounded-[28px] p-6">
         <p className="text-sm font-semibold text-slate-100">Seed review bank</p>
         <p className="mt-2 text-sm text-slate-400">
-          The static mock queue is still here below the live session layer so the screen stays populated for v1 demos.
+          These seeded items now live in the database too, so the review screen stays useful even before a fresh mission creates new misses.
         </p>
         <div className="mt-5 grid gap-4">
-          {reviewQueue.map((item) => (
+          {seedItems.map((item) => (
             <div
               key={item.id}
               className="rounded-[24px] border border-slate-800 bg-slate-950/60 p-5"

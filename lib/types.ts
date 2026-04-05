@@ -97,9 +97,29 @@ export type ReviewItem = {
 
 export type SessionReviewItem = {
   id: string;
+  questionId: string | null;
   prompt: string;
   skill: string;
   section: string;
   source: "missed" | "flagged";
   status: "ready" | "new";
+};
+
+export type PersistedReviewItem = ReviewItem & {
+  questionId: string | null;
+  source: "missed" | "flagged" | "seed";
+  status: "ready" | "new" | "resolved";
+};
+
+export type MissionAttemptRecord = {
+  id: string;
+  questionId: string;
+  day: number;
+  stepId: string;
+  section: "Math" | "Reading & Writing";
+  skill: string;
+  selectedChoice: string;
+  isCorrect: boolean;
+  elapsedSec: number;
+  createdAt?: string;
 };

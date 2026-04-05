@@ -1,14 +1,11 @@
 import {
-  type DashboardStats,
   type DayPlan,
   type MissionDayConfig,
   type MissionQuestionSet,
   type MissionStep,
   type NavItem,
   type Question,
-  type ReviewItem,
-  type RewardBadge,
-  type SkillMetric
+  type ReviewItem
 } from "@/lib/types";
 
 export const marketingNav: NavItem[] = [
@@ -22,17 +19,10 @@ export const appNav: NavItem[] = [
   { href: "/app/plan", label: "Plan" },
   { href: "/app/mission", label: "Mission" },
   { href: "/app/review", label: "Review" },
+  { href: "/app/history", label: "History" },
   { href: "/app/analytics", label: "Analytics" },
   { href: "/app/rewards", label: "Rewards" }
 ];
-
-export const dashboardStats: DashboardStats = {
-  streakDays: 8,
-  xp: 1240,
-  weeklyCompletion: 82,
-  questionsSolved: 146,
-  readinessGain: 70
-};
 
 export const missionSteps: MissionStep[] = [
   {
@@ -173,6 +163,51 @@ export const featuredQuestions: Question[] = [
       "A semicolon correctly joins two closely related independent clauses.",
     estimatedTimeSec: 55,
     errorTags: ["Sentence Boundaries", "Concept Gap"]
+  },
+  {
+    id: "q_math_07",
+    section: "Math",
+    domain: "Algebra",
+    skill: "Linear systems",
+    difficulty: 4,
+    prompt:
+      "If x + 3y = 19 and 2x - y = 7, what is the value of y?",
+    choices: ["2", "3", "4", "5"],
+    answer: "4",
+    explanation:
+      "From 2x - y = 7, y = 2x - 7. Substitute into x + 3y = 19 to get x + 6x - 21 = 19, so 7x = 40 and y = 4.",
+    estimatedTimeSec: 75,
+    errorTags: ["Process Error", "Systems Setup"]
+  },
+  {
+    id: "q_rw_07",
+    section: "Reading & Writing",
+    domain: "Grammar",
+    skill: "Transitions",
+    difficulty: 3,
+    prompt:
+      "The sample size was smaller than expected; _____, the findings were treated as preliminary rather than final.",
+    choices: ["therefore", "meanwhile", "likewise", "for example"],
+    answer: "therefore",
+    explanation:
+      "The second clause follows logically from the first, so a cause-and-effect transition is needed.",
+    estimatedTimeSec: 45,
+    errorTags: ["Logic Link", "Trap Choice"]
+  },
+  {
+    id: "q_math_08",
+    section: "Math",
+    domain: "Algebra",
+    skill: "Variable isolation",
+    difficulty: 3,
+    prompt:
+      "If 4x + y = 25 and y = 9, what is the value of x?",
+    choices: ["3", "4", "5", "6"],
+    answer: "4",
+    explanation:
+      "Substitute 9 for y to get 4x + 9 = 25. Then 4x = 16, so x = 4.",
+    estimatedTimeSec: 35,
+    errorTags: ["Careless Accuracy", "Substitution"]
   }
 ];
 
@@ -266,6 +301,61 @@ export const miniTestQuestions: Question[] = [
       "A semicolon can join related independent clauses, and 'but' shows the contrast.",
     estimatedTimeSec: 50,
     errorTags: ["Punctuation", "Sentence Boundaries"]
+  },
+  {
+    id: "q_math_09",
+    section: "Math",
+    domain: "Algebra",
+    skill: "Systems under time",
+    difficulty: 4,
+    prompt:
+      "If y = 3x - 2 and x + y = 14, what is the value of x?",
+    choices: ["3", "4", "5", "6"],
+    answer: "4",
+    explanation:
+      "Substitute 3x - 2 for y to get x + 3x - 2 = 14. Then 4x = 16, so x = 4.",
+    estimatedTimeSec: 48,
+    errorTags: ["Time Pressure", "Substitution"]
+  },
+  {
+    id: "q_rw_08",
+    section: "Reading & Writing",
+    domain: "Grammar",
+    skill: "Concision",
+    difficulty: 2,
+    prompt:
+      "The committee members collaborated together on the final recommendation. Which revision is most concise?",
+    choices: [
+      "collaborated together on",
+      "collaborated on",
+      "did collaborate together on",
+      "worked collaboratively together on"
+    ],
+    answer: "collaborated on",
+    explanation:
+      "The word 'collaborated' already implies working together, so 'together' is redundant.",
+    estimatedTimeSec: 42,
+    errorTags: ["Concision", "Redundancy"]
+  },
+  {
+    id: "q_rw_09",
+    section: "Reading & Writing",
+    domain: "Grammar",
+    skill: "Sentence boundaries",
+    difficulty: 4,
+    prompt:
+      "The proposal seemed ambitious, the reviewers still approved the first phase. Which choice best revises the sentence?",
+    choices: [
+      "ambitious, the reviewers still approved",
+      "ambitious; the reviewers still approved",
+      "ambitious the reviewers still approved",
+      "ambitious; and the reviewers still approved"
+    ],
+    answer: "ambitious; the reviewers still approved",
+    explanation:
+      "A semicolon correctly joins two independent clauses without adding an unnecessary conjunction.",
+    estimatedTimeSec: 52,
+    errorTags: ["Sentence Boundaries", "Concept Gap"]
   }
 ];
 
@@ -273,38 +363,45 @@ export const dayOneDrillQuestions: Question[] = [
   featuredQuestions[0],
   featuredQuestions[1],
   featuredQuestions[2],
-  featuredQuestions[4]
+  featuredQuestions[4],
+  featuredQuestions[6]
 ];
 
 export const dayOneMiniTestQuestions: Question[] = [
   miniTestQuestions[0],
   miniTestQuestions[1],
   miniTestQuestions[2],
-  miniTestQuestions[4]
+  miniTestQuestions[4],
+  miniTestQuestions[6]
 ];
 
 export const dayTwoDrillQuestions: Question[] = [
   featuredQuestions[0],
   featuredQuestions[2],
-  featuredQuestions[3]
+  featuredQuestions[3],
+  featuredQuestions[8]
 ];
 
 export const dayTwoMiniTestQuestions: Question[] = [
   miniTestQuestions[0],
   miniTestQuestions[2],
-  miniTestQuestions[3]
+  miniTestQuestions[3],
+  miniTestQuestions[6]
 ];
 
 export const dayThreeDrillQuestions: Question[] = [
   featuredQuestions[1],
   featuredQuestions[4],
-  featuredQuestions[5]
+  featuredQuestions[5],
+  featuredQuestions[7]
 ];
 
 export const dayThreeMiniTestQuestions: Question[] = [
   miniTestQuestions[1],
   miniTestQuestions[4],
-  miniTestQuestions[5]
+  miniTestQuestions[5],
+  miniTestQuestions[7],
+  miniTestQuestions[8]
 ];
 
 export const missionQuestionSets: MissionQuestionSet[] = [
@@ -582,74 +679,6 @@ export function getMissionDayConfig(day: number, plan?: DayPlan) {
     )
   };
 }
-
-export const skillMetrics: SkillMetric[] = [
-  { skill: "Linear systems", accuracy: 78, avgTimeSec: 73, backlog: 2, trend: "up" },
-  { skill: "Sentence boundaries", accuracy: 69, avgTimeSec: 49, backlog: 4, trend: "steady" },
-  { skill: "Data interpretation", accuracy: 84, avgTimeSec: 81, backlog: 1, trend: "up" },
-  { skill: "Rhetorical synthesis", accuracy: 72, avgTimeSec: 63, backlog: 3, trend: "down" }
-];
-
-export const reviewQueue: ReviewItem[] = [
-  {
-    id: "r1",
-    prompt: "Choose the transition that best connects the finding to the prior claim.",
-    skill: "Transitions",
-    errorType: "Evidence Error",
-    lastSeen: "Yesterday",
-    section: "Reading & Writing",
-    retryReady: true
-  },
-  {
-    id: "r2",
-    prompt: "Solve for the constant term after expanding the expression.",
-    skill: "Quadratics",
-    errorType: "Process Error",
-    lastSeen: "2 days ago",
-    section: "Math",
-    retryReady: true
-  },
-  {
-    id: "r3",
-    prompt: "Interpret the slope from the table and select the valid claim.",
-    skill: "Linear functions",
-    errorType: "Misread Question",
-    lastSeen: "Today",
-    section: "Math",
-    retryReady: false
-  }
-];
-
-export const rewardBadges: RewardBadge[] = [
-  {
-    id: "b1",
-    title: "Five-Day Lock-In",
-    detail: "Complete five daily missions in a row.",
-    earned: true,
-    category: "streak"
-  },
-  {
-    id: "b2",
-    title: "Review Closer",
-    detail: "Resolve six mistakes through successful retry.",
-    earned: true,
-    category: "review"
-  },
-  {
-    id: "b3",
-    title: "Checkpoint 2",
-    detail: "Hit the second weekly checkpoint with 75%+ completion.",
-    earned: false,
-    category: "checkpoint"
-  },
-  {
-    id: "b4",
-    title: "Grammar Sharpener",
-    detail: "Raise grammar accuracy by 10 points over seven days.",
-    earned: false,
-    category: "mastery"
-  }
-];
 
 export const dayPlan: DayPlan[] = [
   { day: 1, title: "Baseline Starter", focus: "Mixed easy-medium calibration", missionType: "Build momentum", duration: "15 min", status: "complete" },

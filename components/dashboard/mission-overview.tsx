@@ -1,14 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { readClientAppState, subscribeToAppStateSync, syncAppStateFromServer } from "@/lib/app-state-client";
 import { getMissionDayConfig } from "@/data/mock-data";
 import { Chip } from "@/components/ui/chip";
 import { getCurrentDayProgress, getDayRationale, getMissionSnapshot } from "@/lib/mission";
 import {
   defaultMissionProgress,
   defaultStudyProgress,
-  MISSION_PROGRESS_KEY,
-  STUDY_PROGRESS_KEY,
   type StoredMissionProgress,
   type StudyProgress
 } from "@/lib/storage";
@@ -19,26 +18,24 @@ export function MissionOverview() {
   const [studyProgress, setStudyProgress] = useState<StudyProgress>(defaultStudyProgress);
 
   useEffect(() => {
-    try {
-      const storedMission = window.localStorage.getItem(MISSION_PROGRESS_KEY);
-      if (storedMission) {
-        setProgress({
-          ...defaultMissionProgress,
-          ...JSON.parse(storedMission)
-        });
-      }
-
-      const storedStudyProgress = window.localStorage.getItem(STUDY_PROGRESS_KEY);
-      if (storedStudyProgress) {
-        setStudyProgress({
-          ...defaultStudyProgress,
-          ...JSON.parse(storedStudyProgress)
-        });
-      }
-    } catch {
-      window.localStorage.removeItem(MISSION_PROGRESS_KEY);
-      window.localStorage.removeItem(STUDY_PROGRESS_KEY);
+    function syncFromClientState() {
+      const state = readClientAppState();
+      setProgress(state.missionProgress);
+      setStudyProgress(state.studyProgress);
     }
+
+    try {
+      syncFromClientState();
+      void syncAppStateFromServer().then((state) => {
+        setProgress(state.missionProgress);
+        setStudyProgress(state.studyProgress);
+      });
+    } catch {
+      setProgress(defaultMissionProgress);
+      setStudyProgress(defaultStudyProgress);
+    }
+
+    return subscribeToAppStateSync(syncFromClientState);
   }, []);
 
   const snapshot = useMemo(() => getMissionSnapshot(progress), [progress]);
